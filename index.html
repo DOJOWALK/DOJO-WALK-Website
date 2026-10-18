@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ff7900">
-  <meta name="description" content="DOJO WALK is a dog-walking service platform being built to connect pet parents, walkers and operations through one simple experience.">
+  <meta name="description" content="Discover DOJO WALK, a premium dog-walking service experience being built for pet parents and walking partners.">\n  <meta name="robots" content="index,follow">\n  <meta property="og:type" content="website">\n  <meta property="og:title" content="DOJO WALK | Better walks. Happier dogs.">\n  <meta property="og:description" content="A connected dog-walking experience for pet parents, walking partners and operations.">\n  <meta property="og:site_name" content="DOJO WALK">\n  <meta name="twitter:card" content="summary">
   <title>DOJO WALK | Dog Walking, Made Simpler</title>
   <style>
     :root{--orange:#ff7900;--orange-dark:#dc6500;--ink:#242424;--muted:#686868;--cream:#fffaf5;--line:#f0e5dc;--white:#fff;--green:#24734a}
@@ -24,17 +24,53 @@
     @media(max-width:850px){.nav{flex-wrap:wrap;padding:12px 0}.nav-links{order:3;width:100%;overflow-x:auto;justify-content:flex-start;padding:4px 0 8px;gap:18px}.nav-links a{white-space:nowrap}.hero-grid,.safety{grid-template-columns:1fr}.hero{padding-top:55px}.hero-art{min-height:280px}.grid-3,.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.service-main{grid-template-columns:1fr}.journey{grid-template-columns:1fr}.area-box{grid-template-columns:1fr}.cta-band{align-items:flex-start;flex-direction:column}}
     @media(max-width:560px){section{padding:56px 0}.hero h1{letter-spacing:-1.8px}.hero p{font-size:17px}.grid-3,.grid-2,.steps,.contact-grid{grid-template-columns:1fr}.pet-card{padding:18px}.pet-illustration{height:145px;font-size:80px}.service-feature,.cta-band{padding:25px}.footer-top{flex-direction:column}.nav-cta{min-height:40px;padding:9px 13px;font-size:13px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
-  </style>
+
+    /* Premium interaction layer: lightweight CSS 3D, no heavy runtime library. */
+    :focus-visible{outline:3px solid #ff7900;outline-offset:4px}
+    .hero-art{perspective:1100px;isolation:isolate}
+    .hero-art:before,.hero-art:after{content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(1px);pointer-events:none}
+    .hero-art:before{width:260px;height:260px;right:2%;top:5%;background:linear-gradient(145deg,#ffd0a8,#fff1e4);box-shadow:inset -16px -18px 35px rgba(195,95,14,.09);animation:orbFloat 7s ease-in-out infinite}
+    .hero-art:after{width:110px;height:110px;left:1%;bottom:5%;background:linear-gradient(145deg,#fff,#ffd7b8);box-shadow:0 22px 45px rgba(195,95,14,.12);animation:orbFloat 8s ease-in-out infinite reverse}
+    .pet-card{transform-style:preserve-3d;will-change:transform;transition:transform .25s ease,box-shadow .25s ease;box-shadow:0 28px 65px rgba(103,60,20,.12),0 8px 18px rgba(103,60,20,.05)}
+    .pet-card:hover{box-shadow:0 36px 80px rgba(103,60,20,.18),0 12px 24px rgba(103,60,20,.08)}
+    .pet-illustration{position:relative;overflow:hidden;transform:translateZ(20px);box-shadow:inset 0 -12px 30px rgba(193,105,39,.06)}
+    .pet-illustration:after{content:"";position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.55),transparent 45%,rgba(255,121,0,.06));pointer-events:none}
+    .card,.step,.journey-card,.service-row,.contact-box{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+    .card:hover,.step:hover,.journey-card:hover,.service-row:hover,.contact-box:hover{transform:translateY(-4px);border-color:#ffd0a8;box-shadow:0 15px 32px rgba(95,55,24,.07)}
+    .reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+    .reveal.is-visible{opacity:1;transform:translateY(0)}
+    .menu-toggle{display:none;width:44px;height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;align-items:center;justify-content:center;flex-direction:column;gap:5px;cursor:pointer}
+    .menu-toggle span{display:block;width:18px;height:2px;border-radius:2px;background:var(--ink);transition:transform .2s,opacity .2s}
+    .menu-toggle[aria-expanded="true"] span:first-child{transform:translateY(7px) rotate(45deg)}
+    .menu-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+    .menu-toggle[aria-expanded="true"] span:last-child{transform:translateY(-7px) rotate(-45deg)}
+    .back-top{position:fixed;right:18px;bottom:18px;z-index:30;width:46px;height:46px;border:0;border-radius:15px;background:var(--orange);color:white;font-size:21px;font-weight:900;box-shadow:0 8px 25px rgba(122,61,6,.22);cursor:pointer;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+    .back-top.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+    @keyframes orbFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-13px,0)}}
+    @media(max-width:850px){
+      .menu-toggle{display:flex;margin-left:auto}
+      .nav-links{display:none;order:4;width:100%;padding:12px;background:#fff;border:1px solid var(--line);border-radius:15px;overflow:visible;flex-direction:column;align-items:stretch;gap:0}
+      .nav-links.open{display:flex}
+      .nav-links a{padding:11px 8px;border-bottom:1px solid #f5eee8}
+      .nav-links a:last-child{border-bottom:0}
+      .nav-cta{order:3}
+    }
+    @media(prefers-reduced-motion:reduce){
+      .hero-art:before,.hero-art:after{animation:none}
+      .reveal{opacity:1;transform:none;transition:none}
+      .pet-card,.card,.step,.journey-card,.service-row,.contact-box{transition:none}
+    }
+\n  </style>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
   <header>
     <div class="container nav">
       <a class="brand" href="#home" aria-label="DOJO WALK home"><span class="brand-mark" aria-hidden="true">D</span><span>DOJO <span>WALK</span></span></a>
-      <nav class="nav-links" aria-label="Main navigation">
+      <nav class="nav-links" id="primary-nav" aria-label="Main navigation">
         <a href="#services">Services</a><a href="#how-it-works">How it works</a><a href="#safety">Safety</a><a href="#partners">For walkers</a><a href="#company">Company</a><a href="#faq">FAQs</a>
       </nav>
-      <a class="nav-cta" href="#get-started">Get started</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation menu"><span></span><span></span><span></span></button>\n      <a class="nav-cta" href="#get-started">Get started</a>
     </div>
   </header>
   <main id="main">
@@ -167,6 +203,76 @@
       <div class="footer-bottom"><span>© <span id="year">2026</span> DOJO WALK · Dojo Platform</span><span>Website information is not a confirmation that service is available in your area.</span></div>
     </div>
   </footer>
-  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+<button class="back-top" type="button" aria-label="Back to top" title="Back to top">↑</button>
+  <script>
+    (function () {
+      const year = document.getElementById("year");
+      if (year) year.textContent = new Date().getFullYear();
+
+      const menuButton = document.querySelector(".menu-toggle");
+      const nav = document.getElementById("primary-nav");
+      if (menuButton && nav) {
+        menuButton.addEventListener("click", function () {
+          const expanded = menuButton.getAttribute("aria-expanded") === "true";
+          menuButton.setAttribute("aria-expanded", String(!expanded));
+          menuButton.setAttribute("aria-label", expanded ? "Open navigation menu" : "Close navigation menu");
+          nav.classList.toggle("open", !expanded);
+        });
+        nav.querySelectorAll("a").forEach(function (link) {
+          link.addEventListener("click", function () {
+            menuButton.setAttribute("aria-expanded", "false");
+            menuButton.setAttribute("aria-label", "Open navigation menu");
+            nav.classList.remove("open");
+          });
+        });
+        window.addEventListener("resize", function () {
+          if (window.innerWidth > 850) {
+            nav.classList.remove("open");
+            menuButton.setAttribute("aria-expanded", "false");
+            menuButton.setAttribute("aria-label", "Open navigation menu");
+          }
+        });
+      }
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const revealItems = document.querySelectorAll(".section-head, .card, .step, .journey-card, .service-feature, .service-row, .safety-panel, .safety-item, .area-box, .cta-band, .contact-box, .faq details");
+      revealItems.forEach(function (item) { item.classList.add("reveal"); });
+      if ("IntersectionObserver" in window && !reducedMotion) {
+        const observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+        revealItems.forEach(function (item) { observer.observe(item); });
+      } else {
+        revealItems.forEach(function (item) { item.classList.add("is-visible"); });
+      }
+
+      const heroCard = document.querySelector(".pet-card");
+      if (heroCard && window.matchMedia("(hover: hover) and (pointer: fine)").matches && !reducedMotion) {
+        const heroArt = heroCard.closest(".hero-art");
+        heroArt.addEventListener("pointermove", function (event) {
+          const rect = heroCard.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - 0.5;
+          const y = (event.clientY - rect.top) / rect.height - 0.5;
+          heroCard.style.transform = "rotateY(" + (x * 8) + "deg) rotateX(" + (-y * 7) + "deg) translateY(-2px)";
+        });
+        heroArt.addEventListener("pointerleave", function () { heroCard.style.transform = ""; });
+      }
+
+      const backTop = document.querySelector(".back-top");
+      if (backTop) {
+        window.addEventListener("scroll", function () {
+          backTop.classList.toggle("visible", window.scrollY > 500);
+        }, { passive: true });
+        backTop.addEventListener("click", function () {
+          window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
