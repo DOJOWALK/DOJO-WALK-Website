@@ -46,3 +46,12 @@ Open `index.html` in a browser. For a local HTTP preview, run a static web serve
 - Visible keyboard focus styles and semantic navigation landmarks.
 
 These are front-end interactions only. Live booking, payment, contact submissions, location checking, partner applications, account login, analytics and live walk tracking require real backend/service integrations and are not simulated as working features.
+
+
+## Legal and policy page starters
+
+- `privacy.html` — privacy notice starter.
+- `terms.html` — website terms starter.
+- `cancellation-refund.html` — cancellation and refund policy starter.
+
+These are explicitly marked as drafts. They must be reviewed and completed with the verified operating entity, actual data practices, approved service terms, official support details and applicable legal requirements before being treated as final or enabling live transactions.
