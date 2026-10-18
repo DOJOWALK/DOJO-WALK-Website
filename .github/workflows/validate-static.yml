@@ -47,7 +47,7 @@ jobs:
               errors.push(`Form preview ${index + 1} must remain disabled until a secure backend is connected.`);
             }
           }
-          if (!/not sent or stored/i.test(html) || !/not sent or stored/i.test(html)) {
+          if (!/not sent or stored/i.test(html)) {
             errors.push('Missing clear warning that preview submissions are not sent or stored.');
           }
 
