@@ -1,1026 +1,172 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>Dojo Platform | Dojo Walk</title>
-
-  <meta
-    name="description"
-    content="Dojo Walk — a simple and connected walking service powered by Dojo Platform."
-  />
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ff7900">
+  <meta name="description" content="DOJO WALK is a dog-walking service platform being built to connect pet parents, walkers and operations through one simple experience.">
+  <title>DOJO WALK | Dog Walking, Made Simpler</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-      color: #111827;
-      background: #ffffff;
-      line-height: 1.6;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .container {
-      width: min(1100px, 92%);
-      margin: 0 auto;
-    }
-
-    /* HEADER */
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(255, 255, 255, 0.96);
-      border-bottom: 1px solid #eeeeee;
-      backdrop-filter: blur(10px);
-    }
-
-    .nav {
-      min-height: 70px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
-
-    .brand {
-      font-size: 22px;
-      font-weight: 800;
-      color: #e86100;
-      letter-spacing: -0.5px;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .nav-links a {
-      transition: color 0.2s ease;
-    }
-
-    .nav-links a:hover {
-      color: #e86100;
-    }
-
-    /* HERO */
-
-    .hero {
-      background:
-        linear-gradient(
-          180deg,
-          #fff7f1 0%,
-          #ffffff 100%
-        );
-      padding: 90px 0 100px;
-    }
-
-    .hero-content {
-      max-width: 760px;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      margin-bottom: 18px;
-      padding: 7px 13px;
-      border-radius: 999px;
-      background: #fff1e8;
-      color: #e86100;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .hero h1 {
-      font-size: clamp(42px, 8vw, 76px);
-      line-height: 1.02;
-      letter-spacing: -2.5px;
-      margin-bottom: 24px;
-    }
-
-    .hero h1 span {
-      color: #e86100;
-    }
-
-    .hero p {
-      max-width: 650px;
-      color: #4b5563;
-      font-size: 19px;
-      line-height: 1.7;
-      margin-bottom: 32px;
-    }
-
-    .button {
-      display: inline-block;
-      padding: 13px 22px;
-      border-radius: 10px;
-      background: #e86100;
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 15px;
-      transition: 0.2s ease;
-    }
-
-    .button:hover {
-      background: #c94f00;
-      transform: translateY(-1px);
-    }
-
-    /* SECTIONS */
-
-    section {
-      padding: 85px 0;
-    }
-
-    .section-title {
-      max-width: 700px;
-      margin-bottom: 42px;
-    }
-
-    .section-title h2 {
-      font-size: clamp(30px, 5vw, 44px);
-      line-height: 1.15;
-      margin-bottom: 14px;
-      letter-spacing: -1px;
-    }
-
-    .section-title p {
-      color: #6b7280;
-      font-size: 17px;
-    }
-
-    /* ABOUT */
-
-    .about {
-      background: #ffffff;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-    }
-
-    .about-card {
-      padding: 32px;
-      border: 1px solid #eeeeee;
-      border-radius: 18px;
-      background: #ffffff;
-    }
-
-    .about-card h3 {
-      font-size: 22px;
-      margin-bottom: 10px;
-    }
-
-    .about-card p {
-      color: #6b7280;
-    }
-
-    /* DOJO WALK */
-
-    .dojo-walk {
-      background: #fff8f3;
-    }
-
-    .service-card {
-      max-width: 850px;
-      padding: 42px;
-      border-radius: 22px;
-      background: #ffffff;
-      border: 1px solid #f1e5dd;
-      box-shadow: 0 10px 35px rgba(17, 24, 39, 0.06);
-    }
-
-    .service-label {
-      color: #e86100;
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 12px;
-    }
-
-    .service-card h3 {
-      font-size: 34px;
-      margin-bottom: 14px;
-    }
-
-    .service-card p {
-      color: #5f6672;
-      font-size: 17px;
-      margin-bottom: 24px;
-    }
-
-    .service-list {
-      list-style: none;
-      display: grid;
-      gap: 12px;
-    }
-
-    .service-list li {
-      position: relative;
-      padding-left: 25px;
-      color: #374151;
-      font-weight: 600;
-    }
-
-    .service-list li::before {
-      content: "✓";
-      position: absolute;
-      left: 0;
-      color: #e86100;
-      font-weight: 900;
-    }
-
-    /* WHY DOJO WALK */
-
-    .why-dojo {
-      background: #ffffff;
-    }
-
-    .why-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 22px;
-    }
-
-    .why-card {
-      padding: 30px;
-      border: 1px solid #eeeeee;
-      border-radius: 18px;
-      background: #ffffff;
-      transition: 0.2s ease;
-    }
-
-    .why-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
-    }
-
-    .why-number {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      margin-bottom: 18px;
-      border-radius: 12px;
-      background: #fff1e8;
-      color: #e86100;
-      font-weight: 800;
-    }
-
-    .why-card h3 {
-      font-size: 21px;
-      margin-bottom: 8px;
-    }
-
-    .why-card p {
-      color: #6b7280;
-    }
-
-    /* HOW IT WORKS */
-
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-    }
-
-    .step {
-      padding: 30px;
-      border: 1px solid #eeeeee;
-      border-radius: 18px;
-      background: #ffffff;
-    }
-
-    .step-number {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      margin-bottom: 18px;
-      border-radius: 50%;
-      background: #fff1e8;
-      color: #e86100;
-      font-weight: 800;
-    }
-
-    .step h3 {
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-
-    .step p {
-      color: #6b7280;
-    }
-
-    /* GET STARTED */
-
-    .get-started {
-      background: #fff8f3;
-    }
-
-    .get-started-card {
-      max-width: 850px;
-      margin: 0 auto;
-      padding: 48px;
-      border-radius: 24px;
-      background: #ffffff;
-      border: 1px solid #f1e5dd;
-      text-align: center;
-      box-shadow: 0 10px 35px rgba(17, 24, 39, 0.06);
-    }
-
-    .get-started-label {
-      display: inline-block;
-      margin-bottom: 14px;
-      padding: 7px 13px;
-      border-radius: 999px;
-      background: #fff1e8;
-      color: #e86100;
-      font-size: 13px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
-
-    .get-started-card h3 {
-      font-size: clamp(30px, 5vw, 42px);
-      line-height: 1.15;
-      margin-bottom: 14px;
-    }
-
-    .get-started-card p {
-      max-width: 620px;
-      margin: 0 auto 26px;
-      color: #5f6672;
-      font-size: 17px;
-    }
-
-    .coming-soon {
-      display: block;
-      margin-top: 14px;
-      color: #6b7280;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    /* CONTACT */
-
-    .contact {
-      background: #f8f9fa;
-    }
-
-    .contact-card {
-      max-width: 850px;
-      padding: 42px;
-      border-radius: 22px;
-      background: #ffffff;
-      border: 1px solid #eeeeee;
-      box-shadow: 0 10px 35px rgba(17, 24, 39, 0.05);
-    }
-
-    .contact-card h3 {
-      font-size: 32px;
-      margin-bottom: 14px;
-    }
-
-    .contact-card p {
-      max-width: 650px;
-      color: #5f6672;
-      font-size: 17px;
-      margin-bottom: 24px;
-    }
-
-    .contact-status {
-      display: inline-block;
-      padding: 9px 14px;
-      border-radius: 8px;
-      background: #fff1e8;
-      color: #e86100;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    /* CTA */
-
-    .cta {
-      padding: 85px 0;
-      background: #111827;
-      color: #ffffff;
-      text-align: center;
-    }
-
-    .cta h2 {
-      font-size: clamp(30px, 5vw, 46px);
-      line-height: 1.15;
-      margin-bottom: 16px;
-    }
-
-    .cta p {
-      max-width: 600px;
-      margin: 0 auto 28px;
-      color: #d1d5db;
-    }
-
-    /* FOOTER */
-
-    footer {
-      padding: 28px 0;
-      background: #ffffff;
-      border-top: 1px solid #eeeeee;
-    }
-
-    .footer-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .footer-brand {
-      color: #e86100;
-      font-weight: 800;
-    }
-
-    .copyright {
-      color: #6b7280;
-      font-size: 14px;
-    }
-
-    /* MOBILE */
-
-    @media (max-width: 760px) {
-
-      .nav {
-        min-height: 62px;
-      }
-
-      .nav-links {
-        gap: 12px;
-        font-size: 12px;
-      }
-
-      .hero {
-        padding: 70px 0 80px;
-      }
-
-      .hero h1 {
-        letter-spacing: -1.5px;
-      }
-
-      .hero p {
-        font-size: 17px;
-      }
-
-      section {
-        padding: 65px 0;
-      }
-
-      .about-grid,
-      .why-grid,
-      .steps {
-        grid-template-columns: 1fr;
-      }
-
-      .service-card,
-      .contact-card,
-      .get-started-card {
-        padding: 28px;
-      }
-
-      .service-card h3,
-      .contact-card h3 {
-        font-size: 28px;
-      }
-
-      .footer-content {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-
-    @media (max-width: 500px) {
-
-      .nav {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 16px 0;
-      }
-
-      .nav-links {
-        width: 100%;
-        justify-content: space-between;
-        gap: 8px;
-      }
-
-      .hero h1 {
-        font-size: 46px;
-      }
-    }
+    :root{--orange:#ff7900;--orange-dark:#dc6500;--ink:#242424;--muted:#686868;--cream:#fffaf5;--line:#f0e5dc;--white:#fff;--green:#24734a}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:88px}body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff;line-height:1.65}a{color:inherit;text-decoration:none}button,a{touch-action:manipulation}.container{width:min(1120px,92%);margin:auto}.skip{position:absolute;left:-9999px}.skip:focus{left:12px;top:12px;background:#fff;padding:12px;z-index:999}
+    header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:22px}.brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;letter-spacing:-.6px}.brand-mark{width:38px;height:38px;border-radius:13px;background:var(--orange);color:white;display:grid;place-items:center;font-size:21px}.brand span:last-child{color:var(--orange)}.nav-links{display:flex;align-items:center;gap:21px;font-size:14px;font-weight:700}.nav-links a:hover,.footer-links a:hover{color:var(--orange)}.nav-cta,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:12px 20px;border-radius:12px;background:var(--orange);color:white;font-weight:800;border:0;cursor:pointer;transition:background .2s,transform .2s}.nav-cta:hover,.btn:hover{background:var(--orange-dark);transform:translateY(-1px)}.btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.secondary:hover{border-color:var(--orange);color:var(--orange)}
+    .hero{padding:82px 0 76px;background:radial-gradient(ellipse at 90% 15%,#ffe1c8 0,transparent 35%),linear-gradient(180deg,#fff6ee 0%,#fff 100%)}.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;align-items:center;gap:52px}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#ffeadb;color:#a74d00;font-size:12px;font-weight:900;letter-spacing:.8px;text-transform:uppercase}.hero h1{font-size:clamp(42px,6.6vw,76px);line-height:1.02;letter-spacing:-3px;margin:22px 0}.hero h1 em{font-style:normal;color:var(--orange)}.hero p{font-size:19px;color:#5e5a57;max-width:640px;margin:0 0 28px}.actions{display:flex;flex-wrap:wrap;gap:12px}.fine{font-size:12px;color:var(--muted);margin-top:16px}.hero-art{min-height:340px;display:grid;place-items:center;position:relative}.pet-card{width:min(100%,390px);padding:27px;border:1px solid #f0dfd0;border-radius:28px;background:rgba(255,255,255,.88);box-shadow:0 22px 65px rgba(103,60,20,.09);transform:rotate(1deg)}.pet-illustration{height:178px;border-radius:20px;background:#fff0e3;display:grid;place-items:center;font-size:100px}.pet-card h3{margin:18px 0 5px;font-size:22px}.pet-card p{font-size:14px;margin:0;color:var(--muted)}.status-line{display:flex;align-items:center;gap:8px;margin-top:18px;font-size:13px;font-weight:800;color:var(--green)}.dot{width:8px;height:8px;background:#45a86b;border-radius:50%}
+    section{padding:76px 0}.section-head{max-width:720px;margin-bottom:34px}.section-head.center{text-align:center;margin:0 auto 38px}.kicker{color:var(--orange-dark);font-size:12px;font-weight:900;letter-spacing:1px;text-transform:uppercase}.section-head h2{font-size:clamp(30px,4.2vw,46px);letter-spacing:-1.5px;line-height:1.13;margin:10px 0 14px}.section-head p{font-size:17px;color:var(--muted);margin:0}.soft{background:var(--cream)}.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{padding:25px;border:1px solid var(--line);border-radius:19px;background:#fff;min-width:0}.icon{width:46px;height:46px;display:grid;place-items:center;background:#fff0e4;border-radius:14px;font-size:23px;margin-bottom:17px}.card h3{font-size:20px;margin:0 0 8px}.card p{margin:0;color:var(--muted)}.tag{display:inline-block;padding:5px 9px;border-radius:7px;background:#fff0e4;color:#a74d00;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+    .service-main{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:stretch}.service-feature{padding:34px;border-radius:24px;background:#fff;border:1px solid var(--line)}.service-feature h3{font-size:29px;line-height:1.2;margin:14px 0}.service-feature p{color:var(--muted)}.checks{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px}.checks li:before{content:"✓";color:var(--orange);font-weight:900;margin-right:10px}.service-types{display:grid;gap:14px}.service-row{display:flex;gap:16px;padding:21px;border:1px solid var(--line);border-radius:17px;background:#fff}.service-row .icon{flex:0 0 44px;margin:0}.service-row h3{font-size:17px;margin:0 0 4px}.service-row p{font-size:14px;color:var(--muted);margin:0}
+    .steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.step{padding:22px;border-radius:17px;background:#fff;border:1px solid var(--line)}.step-no{font-size:12px;font-weight:900;color:var(--orange);letter-spacing:1px}.step h3{margin:9px 0 7px;font-size:18px}.step p{margin:0;color:var(--muted);font-size:14px}
+    .safety{display:grid;grid-template-columns:.85fr 1.15fr;gap:42px;align-items:center}.safety-panel{padding:32px;border-radius:24px;background:#fff0e4}.safety-panel .big{font-size:60px}.safety-panel h3{font-size:25px;margin:0 0 8px}.safety-panel p{color:#65564a;margin:0}.safety-list{display:grid;gap:18px}.safety-item{display:flex;gap:14px}.safety-item .icon{flex:0 0 42px;width:42px;height:42px;margin:0}.safety-item h3{font-size:17px;margin:0 0 4px}.safety-item p{margin:0;color:var(--muted);font-size:14px}
+    .journey{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.journey-card{padding:26px;border:1px solid var(--line);border-radius:20px;background:white}.journey-card h3{font-size:21px;margin:12px 0 8px}.journey-card p{color:var(--muted);margin:0 0 18px}.journey-card ul{padding-left:19px;color:#56514d;font-size:14px}.journey-card .text-link{color:var(--orange-dark);font-weight:800}
+    .area-box{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;padding:30px;border:1px solid var(--line);border-radius:22px;background:#fff}.area-box h3{font-size:23px;margin:0 0 8px}.area-box p{margin:0;color:var(--muted)}.pill{display:inline-block;margin:5px 5px 0 0;padding:7px 11px;border-radius:999px;background:#f6f2ee;color:#5d5147;font-size:12px;font-weight:800}
+    details{padding:18px 0;border-bottom:1px solid var(--line)}summary{font-weight:800;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:14px}summary:after{content:"+";color:var(--orange);font-size:20px;line-height:1}details[open] summary:after{content:"−"}details p{color:var(--muted);margin:12px 0 0}.faq{max-width:850px;margin:auto}
+    .cta-band{padding:48px;border-radius:26px;background:var(--orange);color:white;display:flex;justify-content:space-between;align-items:center;gap:24px}.cta-band h2{font-size:clamp(28px,4vw,40px);line-height:1.12;margin:0 0 9px;letter-spacing:-1px}.cta-band p{margin:0;color:#fff4eb}.cta-band .btn{background:white;color:#a74d00;flex-shrink:0}.cta-band .btn:hover{background:#fff1e5}
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.contact-box{padding:27px;border:1px solid var(--line);border-radius:18px}.contact-box h3{margin:0 0 8px}.contact-box p{margin:0;color:var(--muted)}.notice{padding:14px 16px;background:#fff7ed;border-radius:12px;color:#80502c;font-size:13px;margin-top:18px}
+    footer{padding:38px 0 22px;border-top:1px solid var(--line)}.footer-top{display:flex;justify-content:space-between;gap:35px;flex-wrap:wrap;padding-bottom:28px}.footer-about{max-width:360px}.footer-about p{font-size:14px;color:var(--muted)}.footer-links{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;font-weight:700}.footer-bottom{border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+    @media(max-width:850px){.nav{flex-wrap:wrap;padding:12px 0}.nav-links{order:3;width:100%;overflow-x:auto;justify-content:flex-start;padding:4px 0 8px;gap:18px}.nav-links a{white-space:nowrap}.hero-grid,.safety{grid-template-columns:1fr}.hero{padding-top:55px}.hero-art{min-height:280px}.grid-3,.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.service-main{grid-template-columns:1fr}.journey{grid-template-columns:1fr}.area-box{grid-template-columns:1fr}.cta-band{align-items:flex-start;flex-direction:column}}
+    @media(max-width:560px){section{padding:56px 0}.hero h1{letter-spacing:-1.8px}.hero p{font-size:17px}.grid-3,.grid-2,.steps,.contact-grid{grid-template-columns:1fr}.pet-card{padding:18px}.pet-illustration{height:145px;font-size:80px}.service-feature,.cta-band{padding:25px}.footer-top{flex-direction:column}.nav-cta{min-height:40px;padding:9px 13px;font-size:13px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
   </style>
 </head>
-
 <body>
-
-  <!-- HEADER -->
-
+  <a class="skip" href="#main">Skip to content</a>
   <header>
     <div class="container nav">
-
-      <a href="#home" class="brand">
-        Dojo Platform
-      </a>
-
-      <nav class="nav-links">
-        <a href="#about">About</a>
-        <a href="#dojo-walk">Dojo Walk</a>
-        <a href="#why-dojo">Why Dojo Walk</a>
-        <a href="#how-it-works">How it works</a>
-        <a href="#get-started">Get Started</a>
-        <a href="#contact">Contact</a>
+      <a class="brand" href="#home" aria-label="DOJO WALK home"><span class="brand-mark" aria-hidden="true">D</span><span>DOJO <span>WALK</span></span></a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#services">Services</a><a href="#how-it-works">How it works</a><a href="#safety">Safety</a><a href="#partners">For walkers</a><a href="#company">Company</a><a href="#faq">FAQs</a>
       </nav>
-
+      <a class="nav-cta" href="#get-started">Get started</a>
     </div>
   </header>
-
-
-  <!-- MAIN -->
-
-  <main>
-
-    <!-- HERO -->
-
+  <main id="main">
     <section class="hero" id="home">
-      <div class="container">
-
-        <div class="hero-content">
-
-          <div class="eyebrow">
-            Dojo Platform
-          </div>
-
-          <h1>
-            Walking made
-            <span>simple.</span>
-          </h1>
-
-          <p>
-            Dojo Walk connects customers with a reliable
-            walking service through a simple,
-            technology-powered platform.
-          </p>
-
-          <a href="#dojo-walk" class="button">
-            Explore Dojo Walk
-          </a>
-
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">A Dojo Platform service</span>
+          <h1>Better walks.<br><em>Happier dogs.</em></h1>
+          <p>DOJO WALK is being built to make dog walking easier to arrange, easier to manage and more connected for pet parents and walkers.</p>
+          <div class="actions"><a class="btn" href="#services">Explore walking services</a><a class="btn secondary" href="#how-it-works">See how it works</a></div>
+          <p class="fine">Service availability and booking access will be confirmed as local operations launch.</p>
         </div>
-
+        <div class="hero-art" aria-label="Illustration of a happy dog and walk status">
+          <div class="pet-card"><div class="pet-illustration" role="img" aria-label="Happy dog illustration">🐕</div><h3>Every walk starts with care.</h3><p>A simple experience for pet parents, with clear steps from request to completion.</p><div class="status-line"><span class="dot"></span> Built around connected service</div></div>
+        </div>
       </div>
     </section>
-
-
-    <!-- ABOUT -->
-
-    <section class="about" id="about">
+    <section id="company">
       <div class="container">
-
-        <div class="section-title">
-
-          <h2>
-            One platform.
-            One simple service.
-          </h2>
-
-          <p>
-            Dojo Platform is built to make the walking
-            experience simple, connected and reliable.
-          </p>
-
+        <div class="section-head"><span class="kicker">Who we are</span><h2>One connected platform. Care at the centre.</h2><p>DOJO WALK is the dog-walking service within Dojo Platform. The goal is to bring customer requests, walker coordination and service operations into a consistent experience.</p></div>
+        <div class="grid-3">
+          <article class="card"><div class="icon" aria-hidden="true">🧡</div><h3>Pet-parent first</h3><p>Clear booking steps, useful pet details and straightforward communication.</p></article>
+          <article class="card"><div class="icon" aria-hidden="true">🤝</div><h3>Walker connected</h3><p>A dedicated partner experience designed around onboarding, assigned walks and completion updates.</p></article>
+          <article class="card"><div class="icon" aria-hidden="true">⚙️</div><h3>Operations organised</h3><p>Admin-led service areas, booking oversight and partner management support the service flow.</p></article>
         </div>
-
-        <div class="about-grid">
-
-          <div class="about-card">
-
-            <h3>
-              Simple
-            </h3>
-
-            <p>
-              A straightforward experience designed
-              around the customer's walking needs.
-            </p>
-
-          </div>
-
-
-          <div class="about-card">
-
-            <h3>
-              Connected
-            </h3>
-
-            <p>
-              Customers, walkers and operations are
-              connected through one platform.
-            </p>
-
-          </div>
-
-        </div>
-
       </div>
     </section>
-
-
-    <!-- DOJO WALK -->
-
-    <section class="dojo-walk" id="dojo-walk">
+    <section class="soft" id="services">
       <div class="container">
-
-        <div class="section-title">
-
-          <h2>
-            Dojo Walk
-          </h2>
-
-          <p>
-            The main walking service from Dojo Platform.
-          </p>
-
-        </div>
-
-
-        <div class="service-card">
-
-          <div class="service-label">
-            Our Service
+        <div class="section-head"><span class="kicker">Dog walking</span><h2>Choose a walk that fits your routine.</h2><p>The planned service flow supports a one-time request, a recurring routine or selected dates. Actual options depend on launch configuration and availability.</p></div>
+        <div class="service-main">
+          <div class="service-feature"><span class="tag">Core service</span><h3>Thoughtful dog walking, organised in one place.</h3><p>Pet parents can prepare their dog's profile, provide pickup instructions, select a schedule and review booking details before confirming.</p><ul class="checks"><li>Dog profile and care notes</li><li>Saved pickup address and instructions</li><li>Schedule and duration selection</li><li>Booking status and service updates</li></ul></div>
+          <div class="service-types">
+            <div class="service-row"><div class="icon" aria-hidden="true">⚡</div><div><h3>Walk Now · One-time walk</h3><p>For a single walk request, subject to service availability and confirmation.</p></div></div>
+            <div class="service-row"><div class="icon" aria-hidden="true">🗓️</div><div><h3>Regular Walk</h3><p>For pet parents planning a repeating walking routine with selected daily time slots.</p></div></div>
+            <div class="service-row"><div class="icon" aria-hidden="true">📍</div><div><h3>Customize · Temporary walks</h3><p>For selected dates and times that suit a changing schedule.</p></div></div>
           </div>
-
-          <h3>
-            Dojo Walk
-          </h3>
-
-          <p>
-            A simple and reliable walking service
-            designed to connect customers with walkers
-            through the Dojo Platform.
-          </p>
-
-          <ul class="service-list">
-
-            <li>
-              Simple booking experience
-            </li>
-
-            <li>
-              Connected walker service
-            </li>
-
-            <li>
-              Reliable walk experience
-            </li>
-
-            <li>
-              Technology-powered operations
-            </li>
-
-          </ul>
-
         </div>
-
+        <p class="fine">Prices, plan terms and cancellation rules will be displayed in the booking flow after they are approved for the service area. No unconfirmed price is promised on this page.</p>
       </div>
     </section>
-
-
-    <!-- WHY DOJO WALK -->
-
-    <section class="why-dojo" id="why-dojo">
-      <div class="container">
-
-        <div class="section-title">
-
-          <h2>
-            Why Dojo Walk?
-          </h2>
-
-          <p>
-            Built around a simple idea:
-            make the walking experience easier and more connected.
-          </p>
-
-        </div>
-
-
-        <div class="why-grid">
-
-          <div class="why-card">
-
-            <div class="why-number">
-              01
-            </div>
-
-            <h3>
-              Simple Experience
-            </h3>
-
-            <p>
-              A straightforward service designed
-              to keep the customer experience easy.
-            </p>
-
-          </div>
-
-
-          <div class="why-card">
-
-            <div class="why-number">
-              02
-            </div>
-
-            <h3>
-              Connected Service
-            </h3>
-
-            <p>
-              Customers and walkers are connected
-              through the Dojo Platform.
-            </p>
-
-          </div>
-
-
-          <div class="why-card">
-
-            <div class="why-number">
-              03
-            </div>
-
-            <h3>
-              Organized Operations
-            </h3>
-
-            <p>
-              Technology helps organize the
-              walking service and its operations.
-            </p>
-
-          </div>
-
-
-          <div class="why-card">
-
-            <div class="why-number">
-              04
-            </div>
-
-            <h3>
-              Reliable Focus
-            </h3>
-
-            <p>
-              Dojo Walk is being built with a focus
-              on a dependable walking experience.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- HOW IT WORKS -->
-
     <section id="how-it-works">
       <div class="container">
-
-        <div class="section-title">
-
-          <h2>
-            How it works
-          </h2>
-
-          <p>
-            Dojo Walk keeps the experience simple
-            from request to completed walk.
-          </p>
-
-        </div>
-
-
+        <div class="section-head"><span class="kicker">Customer journey</span><h2>From booking request to completed walk.</h2><p>A clear journey helps customers know what to expect at every stage.</p></div>
         <div class="steps">
-
-          <div class="step">
-
-            <div class="step-number">
-              1
-            </div>
-
-            <h3>
-              Request
-            </h3>
-
-            <p>
-              Request a Dojo Walk through
-              the platform.
-            </p>
-
-          </div>
-
-
-          <div class="step">
-
-            <div class="step-number">
-              2
-            </div>
-
-            <h3>
-              Connect
-            </h3>
-
-            <p>
-              The platform connects the customer
-              with an available walker.
-            </p>
-
-          </div>
-
-
-          <div class="step">
-
-            <div class="step-number">
-              3
-            </div>
-
-            <h3>
-              Walk
-            </h3>
-
-            <p>
-              Complete the walk through the
-              connected Dojo Walk experience.
-            </p>
-
-          </div>
-
+          <article class="step"><div class="step-no">STEP 01</div><h3>Sign in</h3><p>Sign in and complete the customer profile before using booking features.</p></article>
+          <article class="step"><div class="step-no">STEP 02</div><h3>Add your dog</h3><p>Share your dog's details, care notes and pickup address.</p></article>
+          <article class="step"><div class="step-no">STEP 03</div><h3>Choose a schedule</h3><p>Select a walk type, time and duration, then review the booking details.</p></article>
+          <article class="step"><div class="step-no">STEP 04</div><h3>Track the status</h3><p>Follow booking updates and, when supported, walk progress and completion details.</p></article>
         </div>
-
       </div>
     </section>
-
-
-    <!-- GET STARTED -->
-
-    <section class="get-started" id="get-started">
+    <section class="soft" id="safety">
+      <div class="container safety">
+        <div class="safety-panel"><div class="big" aria-hidden="true">🐾</div><h3>Care is more than a booking.</h3><p>Good service depends on clear instructions, appropriate partner checks, dependable communication and a way to raise concerns.</p></div>
+        <div><div class="section-head"><span class="kicker">Safety & trust</span><h2>Designed for responsible service.</h2><p>These are the operational principles the DOJO WALK experience is being built around. Specific checks and features will be described only when implemented and active.</p></div>
+          <div class="safety-list">
+            <div class="safety-item"><div class="icon" aria-hidden="true">🪪</div><div><h3>Partner onboarding</h3><p>Document-based partner review is part of the planned onboarding process; approval must be completed before work is assigned.</p></div></div>
+            <div class="safety-item"><div class="icon" aria-hidden="true">📋</div><div><h3>Clear care instructions</h3><p>Pet details, special-care notes and pickup instructions help communicate relevant information.</p></div></div>
+            <div class="safety-item"><div class="icon" aria-hidden="true">📍</div><div><h3>Walk updates</h3><p>Live location, route history and walk status are intended for supported active walks where those features are enabled.</p></div></div>
+            <div class="safety-item"><div class="icon" aria-hidden="true">💬</div><div><h3>Support and complaints</h3><p>A support process is planned to help route booking questions and service concerns to operations.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="partners">
       <div class="container">
-
-        <div class="get-started-card">
-
-          <div class="get-started-label">
-            Get Started
-          </div>
-
-          <h3>
-            Ready for a Dojo Walk?
-          </h3>
-
-          <p>
-            Dojo Walk is being prepared to make
-            the walking experience simple,
-            connected and reliable.
-          </p>
-
-          <a href="#contact" class="button">
-            Get Started
-          </a>
-
-          <span class="coming-soon">
-            Booking is coming soon.
-          </span>
-
+        <div class="section-head"><span class="kicker">For walking partners</span><h2>Help make every walk a better experience.</h2><p>DOJO WALK is also building a partner workflow to support onboarding and day-to-day walk assignments.</p></div>
+        <div class="grid-2">
+          <article class="card"><div class="icon" aria-hidden="true">📄</div><h3>1. Apply and share documents</h3><p>Provide the requested profile and documents for review. Submission alone does not mean approval.</p></article>
+          <article class="card"><div class="icon" aria-hidden="true">🧭</div><h3>2. Set your work area</h3><p>Choose from the service locations enabled by operations, subject to partner eligibility.</p></article>
+          <article class="card"><div class="icon" aria-hidden="true">🐕</div><h3>3. Receive walk assignments</h3><p>Review assigned walk details and follow the in-app process for starting and completing a walk.</p></article>
+          <article class="card"><div class="icon" aria-hidden="true">✅</div><h3>4. Update walk progress</h3><p>Record the supported walk status and completion details through the partner experience.</p></article>
         </div>
-
+        <p class="fine">Partner applications and account access are not submitted through this public page yet.</p>
       </div>
     </section>
-
-
-    <!-- CONTACT -->
-
-    <section class="contact" id="contact">
+    <section class="soft" id="operations">
       <div class="container">
-
-        <div class="section-title">
-
-          <h2>
-            Contact Dojo Platform
-          </h2>
-
-          <p>
-            Have a question about Dojo Walk?
-            Get in touch with Dojo Platform.
-          </p>
-
+        <div class="section-head"><span class="kicker">Behind the service</span><h2>One operational flow across the platform.</h2><p>The public website explains the service. The admin portal controls operational setup; the customer and partner apps use the approved configuration.</p></div>
+        <div class="steps">
+          <article class="step"><div class="step-no">ADMIN 01</div><h3>Service locations</h3><p>Set up supported country, state, district, city and area records and their verified boundaries.</p></article>
+          <article class="step"><div class="step-no">ADMIN 02</div><h3>Service readiness</h3><p>Configure approved availability, pricing and operational rules for each enabled area.</p></article>
+          <article class="step"><div class="step-no">OPERATIONS 03</div><h3>Booking & partners</h3><p>Review booking requests, partner eligibility, assignment and service exceptions.</p></article>
+          <article class="step"><div class="step-no">SERVICE 04</div><h3>Complete & support</h3><p>Follow supported walk status, completion records and complaint handling.</p></article>
         </div>
-
-
-        <div class="contact-card">
-
-          <div class="service-label">
-            Contact
-          </div>
-
-          <h3>
-            We're here to help.
-          </h3>
-
-          <p>
-            Dojo Walk is being built to provide
-            a simple, connected and reliable
-            walking experience.
-          </p>
-
-          <div class="contact-status">
-            Contact details coming soon
-          </div>
-
-        </div>
-
       </div>
     </section>
-
-
-    <!-- CTA -->
-
-    <section class="cta">
+    <section id="service-areas">
       <div class="container">
-
-        <h2>
-          The walk starts here.
-        </h2>
-
-        <p>
-          Dojo Walk is being built to make
-          walking services simple, connected
-          and reliable.
-        </p>
-
-        <a href="#get-started" class="button">
-          Get Started
-        </a>
-
+        <div class="section-head"><span class="kicker">Availability</span><h2>Service areas are enabled deliberately.</h2><p>DOJO WALK availability should be shown only for locations that operations has activated and can serve.</p></div>
+        <div class="area-box"><div><h3>Check your area when booking becomes available</h3><p>Coverage is managed through the service-location setup. A city or area is not considered live just because it appears on a map.</p><div><span class="pill">Admin-approved locations</span><span class="pill">Area boundaries</span><span class="pill">Operational readiness</span></div></div><a class="btn" href="#get-started">Get launch updates</a></div>
       </div>
     </section>
-
+    <section id="get-started" class="soft">
+      <div class="container">
+        <div class="cta-band"><div><h2>Ready for a better walk?</h2><p>Follow DOJO WALK as customer booking and partner access become available.</p></div><a class="btn" href="#contact">Contact the team</a></div>
+      </div>
+    </section>
+    <section id="faq">
+      <div class="container">
+        <div class="section-head center"><span class="kicker">FAQs</span><h2>Questions, answered clearly.</h2><p>Key details about the planned DOJO WALK service.</p></div>
+        <div class="faq">
+          <details><summary>Is booking open right now?</summary><p>This public website does not currently provide a live booking form. Booking access should be announced once the customer flow and local operations are ready.</p></details>
+          <details><summary>Which locations are supported?</summary><p>Only areas enabled and staffed through the service-location and operations setup should be treated as supported. Confirm availability through the booking experience when it launches.</p></details>
+          <details><summary>What walking options are planned?</summary><p>The planned customer flow includes a one-time walk, a regular walking routine and walks on selected dates. Available options may vary by area.</p></details>
+          <details><summary>How can I become a walking partner?</summary><p>Partner onboarding is being developed separately. This page does not yet collect applications or documents.</p></details>
+          <details><summary>Where can I get help or report a concern?</summary><p>Official contact details and support channels need to be published before customer bookings open. Do not send sensitive pet or personal information through unofficial channels.</p></details>
+          <details><summary>How are prices and cancellations handled?</summary><p>Approved prices, plan conditions and cancellation terms should be presented before booking confirmation. This page does not make an unconfirmed price or refund promise.</p></details>
+        </div>
+      </div>
+    </section>
+    <section id="contact">
+      <div class="container">
+        <div class="section-head"><span class="kicker">Contact</span><h2>Connect with DOJO WALK.</h2><p>Company contact channels will be published here after they are confirmed.</p></div>
+        <div class="contact-grid">
+          <div class="contact-box"><h3>Customer questions</h3><p>For booking, service availability, pet-care instructions and support information.</p></div>
+          <div class="contact-box"><h3>Partner and business enquiries</h3><p>For walker onboarding, local operations and partnership enquiries.</p></div>
+        </div>
+        <div class="notice"><strong>Contact details pending:</strong> No phone number, email address or physical office address has been invented for this page. Add verified official details before public launch.</div>
+      </div>
+    </section>
   </main>
-
-
-  <!-- FOOTER -->
-
   <footer>
-    <div class="container footer-content">
-
-      <div class="footer-brand">
-        Dojo Platform
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-about"><a class="brand" href="#home"><span class="brand-mark" aria-hidden="true">D</span><span>DOJO <span>WALK</span></span></a><p>A dog-walking service being built to connect pet parents, walking partners and operations through one organised platform.</p></div>
+        <nav class="footer-links" aria-label="Footer navigation"><a href="#company">About</a><a href="#services">Services</a><a href="#safety">Safety</a><a href="#partners">Partners</a><a href="#faq">FAQs</a><a href="#contact">Contact</a></nav>
       </div>
-
-      <div class="copyright">
-        © 2026 Dojo Platform. All rights reserved.
-      </div>
-
+      <div class="footer-bottom"><span>© <span id="year">2026</span> DOJO WALK · Dojo Platform</span><span>Website information is not a confirmation that service is available in your area.</span></div>
     </div>
   </footer>
-
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 </html>
