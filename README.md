@@ -55,3 +55,11 @@ These are front-end interactions only. Live booking, payment, contact submission
 - `cancellation-refund.html` — cancellation and refund policy starter.
 
 These are explicitly marked as drafts. They must be reviewed and completed with the verified operating entity, actual data practices, approved service terms, official support details and applicable legal requirements before being treated as final or enabling live transactions.
+
+
+## Contact enquiry form previews
+
+- Customer enquiry form fields and walker partner enquiry form fields are laid out with labels and input limits.
+- Submission controls are intentionally disabled until a secure backend endpoint is configured.
+- The forms do not send or store submissions. Do not collect real personal information with this preview.
+- Before launch, add server-side validation, spam protection/rate limiting, privacy notice alignment, secure routing to the operations team, and a clear success/error state after confirmed server response.
