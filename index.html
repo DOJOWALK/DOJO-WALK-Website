@@ -312,6 +312,14 @@
             menuButton.setAttribute("aria-label", "Open navigation menu");
           }
         });
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape" && nav.classList.contains("open")) {
+            nav.classList.remove("open");
+            menuButton.setAttribute("aria-expanded", "false");
+            menuButton.setAttribute("aria-label", "Open navigation menu");
+            menuButton.focus();
+          }
+        });
       }
 
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
