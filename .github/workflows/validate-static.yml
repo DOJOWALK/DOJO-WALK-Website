@@ -1,0 +1,59 @@
+name: Validate static website
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate HTML links, local assets and preview forms
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const errors = [];
+
+          if (!/^<!doctype html>/i.test(html.trimStart())) errors.push('Missing HTML doctype.');
+          if (!/<html\b/i.test(html) || !/<\/html>/i.test(html)) errors.push('HTML document tags are incomplete.');
+
+          const ids = new Set([...html.matchAll(/\bid=["']([^"']+)["']/gi)].map(m => m[1]));
+          for (const match of html.matchAll(/\bhref=["']#([^"']+)["']/gi)) {
+            if (!ids.has(match[1])) errors.push(`Missing internal anchor target: #${match[1]}`);
+          }
+
+          for (const match of html.matchAll(/\b(?:src|href)=["']([^"']+)["']/gi)) {
+            const value = match[1].trim();
+            if (!value || value.startsWith('#') || /^(?:https?:|mailto:|tel:|data:|javascript:)/i.test(value)) continue;
+            const localPath = decodeURIComponent(value.split(/[?#]/)[0]);
+            if (!localPath) continue;
+            if (!fs.existsSync(path.resolve('.', localPath))) errors.push(`Missing local file: ${value}`);
+          }
+
+          const forms = [...html.matchAll(/<form\b[\s\S]*?<\/form>/gi)].map(m => m[0]);
+          if (forms.length < 2) errors.push('Expected customer and walker enquiry form previews.');
+          for (const [index, form] of forms.entries()) {
+            if (!/<button\b[^>]*\bdisabled\b/i.test(form)) {
+              errors.push(`Form preview ${index + 1} must remain disabled until a secure backend is connected.`);
+            }
+          }
+          if (!/not sent or stored/i.test(html) || !/not sent or stored/i.test(html)) {
+            errors.push('Missing clear warning that preview submissions are not sent or stored.');
+          }
+
+          if (errors.length) {
+            console.error(errors.map(e => '- ' + e).join('\n'));
+            process.exit(1);
+          }
+          console.log(`Static website validation passed: ${ids.size} IDs, internal anchors, local files, and ${forms.length} disabled form previews checked.`);
+          NODE
