@@ -1,1 +1,36 @@
-# dojo-platform-website
+# DOJO WALK Website
+
+Public company website for DOJO WALK, the dog-walking service within Dojo Platform.
+
+## Website structure
+
+1. **Home** — brand introduction and primary calls to action.
+2. **Company** — platform purpose and customer/partner/operations principles.
+3. **Services** — Walk Now (one-time), Regular Walk, and Customize (selected-date walks).
+4. **Customer journey** — sign in, add dog and address, select schedule, follow booking status.
+5. **Safety & trust** — intended partner onboarding, pet-care instructions, supported walk updates, and support principles.
+6. **For walking partners** — planned onboarding, service-area selection, assignments, and walk completion.
+7. **Operations flow** — service locations, service readiness, booking and partner coordination, completion and support.
+8. **Service areas** — availability is controlled by approved operational setup.
+9. **FAQs, get started, contact, and footer** — clear launch-state information.
+
+## Technology
+
+- Static HTML, CSS, and a small vanilla JavaScript snippet.
+- Responsive layout for mobile and desktop.
+- No external JavaScript libraries or runtime service dependencies.
+
+## Local preview
+
+Open `index.html` in a browser. For a local HTTP preview, run a static web server from the repository root.
+
+## Before public launch
+
+- Confirm and publish official support email, phone and business address as appropriate.
+- Publish reviewed Privacy Policy, Terms & Conditions, Cancellation/Refund Policy and other applicable notices.
+- Connect booking and partner CTAs only after the corresponding production flows are available.
+- Confirm live service areas, prices, service terms and operational claims with the admin configuration.
+- Test all links and layout on mobile and desktop.
+- Configure the custom domain and GitHub Pages deployment if required.
+
+**Important:** This website describes the intended service and product flow. It does not claim that bookings, live tracking, partner applications, support channels or all listed operational features are currently live.
