@@ -44,9 +44,9 @@
       <form id="customer-login-form">
         <label class="label" for="phone">Mobile number</label>
         <div class="phone-row"><span class="country" aria-label="India country code">🇮🇳 +91</span><input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="10-digit mobile number" aria-describedby="auth-status" required></div>
-        <button class="send" type="button" disabled aria-disabled="true">OTP sign-in not enabled yet</button>
+        <button class="send" id="auth-button" type="button" disabled aria-disabled="true">OTP sign-in not enabled yet</button>
       </form>
-      <div class="status" id="auth-status" role="status"><strong>Secure sign-in is being connected</strong>No OTP will be sent from this preview. Firebase Phone Authentication and authorized domain configuration must be connected and tested before customer login is enabled.</div>
+      <div class="status" id="auth-status" role="status" aria-live="polite"><strong id="auth-status-title">Secure sign-in is being connected</strong><span id="auth-status-copy">No OTP will be sent from this preview. Firebase Phone Authentication and authorized domain configuration must be connected and tested before customer login is enabled.</span></div>
       <p class="privacy">By continuing when sign-in launches, you’ll agree to our <a href="terms.html">Terms</a> and acknowledge our <a href="privacy.html">Privacy Notice</a>.</p>
     </section>
   </main>
@@ -57,6 +57,9 @@
     const existingButton = document.getElementById("existing-user");
     const newButton = document.getElementById("new-user");
     const accountHint = document.getElementById("account-hint");
+    const authButton = document.getElementById("auth-button");
+    const authStatusTitle = document.getElementById("auth-status-title");
+    const authStatusCopy = document.getElementById("auth-status-copy");
     function selectAccountType(isNew) {
       existingButton.setAttribute("aria-pressed", String(!isNew));
       newButton.setAttribute("aria-pressed", String(isNew));
@@ -64,6 +67,11 @@
         ? "New customers will verify their mobile number first, then set up their name and dog profile. Account creation is not active in this preview."
         : "Existing customers will securely sign in to access their saved dog details and bookings.";
       document.getElementById("login-title").textContent = isNew ? "Create customer account" : "Customer login";
+      authButton.textContent = isNew ? "Account creation not enabled yet" : "OTP sign-in not enabled yet";
+      authStatusTitle.textContent = isNew ? "New account setup is not active yet" : "Secure sign-in is being connected";
+      authStatusCopy.textContent = isNew
+        ? "No account will be created and no OTP will be sent from this preview. Once Firebase Phone Authentication is configured and tested, your verified number can be used to start a customer profile."
+        : "No OTP will be sent from this preview. Firebase Phone Authentication and authorized domain configuration must be connected and tested before customer login is enabled.";
     }
     existingButton.addEventListener("click", function(){selectAccountType(false);});
     newButton.addEventListener("click", function(){selectAccountType(true);});
