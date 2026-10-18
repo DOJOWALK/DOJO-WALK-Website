@@ -68,7 +68,8 @@
       .reveal{opacity:1;transform:none;transition:none}
       .pet-card,.card,.step,.journey-card,.service-row,.contact-box{transition:none}
     }
-\n  </style>
+\n  .enquiry-card{min-width:0}.enquiry-form{display:grid;gap:8px;margin-top:18px}.enquiry-form label{font-size:13px;font-weight:800;color:var(--ink);margin-top:5px}.enquiry-form input,.enquiry-form select,.enquiry-form textarea{width:100%;min-height:44px;padding:11px 12px;border:1px solid #e7d8cb;border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-size:14px}.enquiry-form textarea{resize:vertical}.enquiry-form input:focus-visible,.enquiry-form select:focus-visible,.enquiry-form textarea:focus-visible{outline:3px solid rgba(255,121,0,.22);border-color:var(--orange)}.enquiry-form button:disabled{width:100%;opacity:.7;cursor:not-allowed}.form-note{font-size:12px!important;line-height:1.5;color:var(--muted)!important;margin:4px 0 0!important}
+  </style>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -193,12 +194,46 @@
     </section>
     <section id="contact">
       <div class="container">
-        <div class="section-head"><span class="kicker">Contact</span><h2>Connect with DOJO WALK.</h2><p>Company contact channels will be published here after they are confirmed.</p></div>
+        <div class="section-head"><span class="kicker">Contact</span><h2>Connect with DOJO WALK.</h2><p>Choose the enquiry type that fits you. These forms are prepared for the website; sending is not enabled until a secure backend is connected.</p></div>
         <div class="contact-grid">
-          <div class="contact-box"><h3>Customer questions</h3><p>For booking, service availability, pet-care instructions and support information.</p></div>
-          <div class="contact-box"><h3>Partner and business enquiries</h3><p>For walker onboarding, local operations and partnership enquiries.</p></div>
+          <article class="contact-box enquiry-card">
+            <h3>Customer enquiry</h3>
+            <p>Questions about dog walking, service availability or pet-care needs.</p>
+            <form class="enquiry-form" aria-describedby="customer-form-note">
+              <label for="customer-name">Your name</label>
+              <input id="customer-name" name="name" type="text" autocomplete="name" maxlength="100" required>
+              <label for="customer-contact">Email or phone</label>
+              <input id="customer-contact" name="contact" type="text" autocomplete="email" maxlength="120" required>
+              <label for="customer-topic">What do you need help with?</label>
+              <select id="customer-topic" name="topic" required>
+                <option value="">Choose a topic</option><option>Dog walking service</option><option>Service availability</option><option>Booking question</option><option>Other question</option>
+              </select>
+              <label for="customer-message">Message</label>
+              <textarea id="customer-message" name="message" rows="3" maxlength="1000" required></textarea>
+              <button class="btn" type="button" disabled>Enquiry sending not enabled</button>
+              <p class="form-note" id="customer-form-note">Preview only — do not enter personal information. Your message is not sent or stored.</p>
+            </form>
+          </article>
+          <article class="contact-box enquiry-card">
+            <h3>Walker partner enquiry</h3>
+            <p>Interested in becoming a walking partner or joining local operations?</p>
+            <form class="enquiry-form" aria-describedby="partner-form-note">
+              <label for="partner-name">Your name</label>
+              <input id="partner-name" name="name" type="text" autocomplete="name" maxlength="100" required>
+              <label for="partner-contact">Email or phone</label>
+              <input id="partner-contact" name="contact" type="text" autocomplete="email" maxlength="120" required>
+              <label for="partner-city">City</label>
+              <input id="partner-city" name="city" type="text" maxlength="100" required>
+              <label for="partner-area">Preferred work area</label>
+              <input id="partner-area" name="area" type="text" maxlength="120" required>
+              <label for="partner-message">Brief introduction (optional)</label>
+              <textarea id="partner-message" name="message" rows="3" maxlength="1000"></textarea>
+              <button class="btn" type="button" disabled>Applications not enabled</button>
+              <p class="form-note" id="partner-form-note">Preview only — do not enter personal information. Your application is not sent or stored.</p>
+            </form>
+          </article>
         </div>
-        <div class="notice"><strong>Contact details pending:</strong> No phone number, email address or physical office address has been invented for this page. Add verified official details before public launch.</div>
+        <div class="notice"><strong>Before launch:</strong> connect these forms to a secure server endpoint, add server-side validation and spam protection, and publish verified official support details. No contact details have been invented.</div>
       </div>
     </section>
   </main>
