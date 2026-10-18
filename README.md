@@ -34,3 +34,15 @@ Open `index.html` in a browser. For a local HTTP preview, run a static web serve
 - Configure the custom domain and GitHub Pages deployment if required.
 
 **Important:** This website describes the intended service and product flow. It does not claim that bookings, live tracking, partner applications, support channels or all listed operational features are currently live.
+
+
+## Interactive website features
+
+- Accessible mobile navigation menu with expanded/collapsed state.
+- Lightweight CSS 3D-inspired hero card and pointer tilt on compatible desktop devices.
+- Scroll reveal transitions with reduced-motion support.
+- Back-to-top control.
+- Open Graph and search-engine metadata.
+- Visible keyboard focus styles and semantic navigation landmarks.
+
+These are front-end interactions only. Live booking, payment, contact submissions, location checking, partner applications, account login, analytics and live walk tracking require real backend/service integrations and are not simulated as working features.
