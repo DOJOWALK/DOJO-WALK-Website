@@ -407,3 +407,37 @@ Rechecked PR #5 and the exact source files on `feature/website-customer-auth-pro
 
 **Step 68 status:** PR and source evidence rechecked and documented. No application source, workflow, Firebase Console settings, Firestore rules, PR state, merge, or production deployment was changed in this step. The remaining hard blocker is access to an authoritative export/snapshot of the currently deployed rules plus a reviewed shared rules candidate before Emulator tests can meaningfully validate the intended behavior.
 
+# Step 69: Website draft profile rules vs Flutter Customer payload
+
+Performed a direct source-level field comparison using these checked-in files:
+- Website draft rules: `firestore.rules`, blob `1e94b14ec855dd0450d30b735b02859be13b3331`.
+- Website profile writer: `customer-profile.html`, blob `e4c41d279640e6c62ee8a29786041d871ad7f922`.
+- Flutter Customer profile writer: `dojoplatform2026/dojo-walk-customer/lib/features/profile/screens/name_setup_screen.dart`, blob `30601d4c884e2a30ffc7a7bcd4a1e09d330c3bfa`.
+- Partner checked-in rules: `dojoplatform2026/dojo-partner/firestore.rules`, blob `7b02a8bfb4fe80ab04d72f59966e2e09c848ffd0`.
+
+#### Field-level compatibility finding
+
+The Website profile writer submits `uid`, `name`, `gender` (empty string allowed by its UI), `dateOfBirth` as a Firestore Timestamp, `age`, `phoneNumber`, `email` (empty string if absent), `photoUrl`, `role`, `profileCompleted`, `updatedAt`, and conditionally `createdAt`. It uses `setDoc(..., { merge: true })` and preserves a valid existing `createdAt` where possible.
+
+The inspected Flutter Customer writer submits `uid`, `name`, `gender`, `dateOfBirth` as a Firestore Timestamp, `phoneNumber`, `photoUrl`, `role`, `profileCompleted`, `updatedAt`, and conditionally `createdAt`; it does **not** include `age` or `email` in this save payload.
+
+The Website draft rules' `validProfileFields()` requires `age` to be an integer in the 18–120 range and `email` to be a string, as well as requiring other profile fields. Therefore, **if the Website draft rules were deployed as the shared ruleset, the inspected Flutter profile writer's create/update payload would fail the required-field checks** because `age` and `email` are absent. This is an additional concrete reason not to deploy those rules as shared production rules.
+
+The Partner checked-in rules also use their own field allowlists for user create/update. The prior audit established that those allowlists do not include every field written by Website/Flutter (including `uid` and `profileCompleted` in the inspected create payload); if those rules were deployed, writes could be rejected. Actual deployed-rule provenance remains unknown.
+
+#### Step 69 outcome
+
+| Check | Result |
+|---|---|
+| Website profile payload fields inventoried | PASS |
+| Flutter Customer profile payload fields inventoried | PASS |
+| Website draft rule vs Flutter payload | INCOMPATIBLE — required `age` and `email` missing in Flutter payload |
+| Shared rules candidate ready | NO |
+| Deployed rules status known | NO — not verified |
+| Emulator tests run | NOT RUN |
+| Production deployment | NO |
+
+**Required design resolution before rules implementation:** agree a canonical shared `users/{uid}` schema across Website and Flutter Customer, explicitly decide whether `age` is stored or derived from `dateOfBirth`, decide whether `email` is optional, and define allowed create/update fields without breaking existing profile documents. Then validate all clients' positive and negative cases against one reviewed rules candidate in the Firestore Emulator.
+
+No source code, Firestore rules, Firebase Console settings, PR state, or production environment was changed in Step 69; only this audit report was updated.
+
