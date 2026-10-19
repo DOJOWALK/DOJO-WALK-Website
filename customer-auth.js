@@ -127,7 +127,7 @@ async function verifyOtp() {
     authButton.style.color = "#fff";
     setStatus(
       isNewUser ? "Phone verified — next: customer profile" : "Phone verified — signed in",
-      "Your Firebase phone sign-in succeeded (" + phone + "). Customer profile saving, dog details, and bookings are not connected yet; no booking has been created.",
+      "Your Firebase phone sign-in succeeded (" + phone + "). Continue to your customer profile to save your personal details. Dog details and bookings are not connected yet; no booking has been created.",
       "success"
     );
     document.getElementById("profile-next-step").hidden = false;
