@@ -153,3 +153,13 @@ Static source-code checks only. This is not a live integration test, security ce
 - No browser execution, real SMS/OTP, Firebase Emulator, live Auth/Firestore, or Android test was run. No merge or deployment was performed.
 
 **Step 25 result:** The mismatch between an editable phone field and the pending OTP confirmation is addressed in source. Runtime verification remains outstanding; PR #4 remains a draft, and the partial Firestore rules must not be deployed to the shared project as-is.
+
+## Step 26 — Auth-state and reCAPTCHA cleanup review
+
+- Reviewed sign-out and auth-state transitions after Step 25.
+- Fixed cleanup so the reCAPTCHA verifier/container is cleared on a successful sign-out and during an idle signed-out auth-state transition. The cleanup is skipped inside the auth listener while another auth action is busy to avoid interrupting an in-flight OTP request.
+- Static review confirms the restart action still clears the pending confirmation result and the sign-out path now explicitly clears reCAPTCHA before reporting success.
+- This remains source-level review only. No JavaScript/browser execution, SMS delivery, Firebase Auth/Firestore request, Emulator test, or Android end-to-end test was run.
+- No merge or deployment was performed. The partial Firestore rules remain unsafe to deploy to the shared project until the full customer/partner/admin ruleset is integrated and tested.
+
+**Step 26 result:** Auth-state cleanup improvement committed on the feature branch; runtime behavior still requires testing.
