@@ -70,6 +70,25 @@ function ageOn(dateString) {
   return age;
 }
 
+function dateOfBirthInputValue(value) {
+  if (typeof value === "string") {
+    return /^\\d{4}-\\d{2}-\\d{2}$/.test(value) && isValidDateOfBirth(value)
+      ? value
+      : "";
+  }
+  // Firestore Timestamp values must be converted to a date-input string.
+  if (value && typeof value.toDate === "function") {
+    const date = value.toDate();
+    if (Number.isNaN(date.getTime())) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const result = `${year}-${month}-${day}`;
+    return isValidDateOfBirth(result) ? result : "";
+  }
+  return "";
+}
+
 onAuthStateChanged(auth, async user => {
   currentUser = user;
   saveButton.disabled = !user;
@@ -91,7 +110,7 @@ onAuthStateChanged(auth, async user => {
       const data = snapshot.data();
       document.getElementById("name").value = data.name || "";
       document.getElementById("gender").value = data.gender || "";
-      document.getElementById("dob").value = data.dateOfBirth || "";
+      document.getElementById("dob").value = dateOfBirthInputValue(data.dateOfBirth);
       savedPhotoUrl = data.photoUrl || "";
       status("Your saved profile was loaded.", "success");
       saveButton.textContent = "Update profile";
