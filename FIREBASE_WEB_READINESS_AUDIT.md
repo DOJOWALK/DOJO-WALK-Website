@@ -567,3 +567,33 @@ Do not merge PR #2–#4 automatically. PR #2 and #3 remain drafts even though Gi
 
 No application source, workflows, Firestore rules, Firebase Console settings, or production data were changed in Step 73. This step records refreshed PR metadata only.
 
+# Step 74: PR #4 divergence and merge-blocker analysis
+
+The changed-file list and commit comparison for PR #4 were inspected after the refreshed PR metadata showed `mergeable: false`.
+
+## Evidence
+
+- PR #4 changes nine paths: the auth integration workflow, customer login/profile QA report, Firebase readiness report, Firestore deployment notes, `customer-auth.js`, `customer-login.html`, `customer-profile.html`, `firebase.json`, and `firestore.rules`.
+- GitHub's comparison between PR #4 base `feature/website-customer-login-structure` (base SHA `4f7f6c36a320ba44a5efec286bcdff271ba82017`) and head `feature/website-customer-profile-firestore` reports **diverged**, `ahead_by: 53`, `behind_by: 5`, and merge base `beb261463001df1701a20e0b3fceb8264534521f`.
+- This is more than a clean fast-forward. The head includes many changes and lacks five commits from the base branch at the time of comparison. PR #5 is already merged into the PR #4 head branch; that does not remove the divergence or establish that the result is safe to promote.
+- PR #4 includes a draft `firestore.rules` and a `firebase.json` pointing to it. The rules deny every collection except owner-scoped `users/{uid}`. They must not be deployed as the shared project's production rules.
+- The GitHub tools available in this pass did not expose a safe branch merge/rebase/conflict-resolution action. No attempt was made to overwrite either branch or recreate a guessed merge.
+
+## Decision
+
+**PR #4 remains BLOCKED.** Do not mark it ready, merge it, or deploy its rules until the branch divergence is resolved using a verified merge/rebase workflow and the full resulting diff is reviewed. A safe next implementation path is to create a fresh integration branch from the intended current base, apply only the intended customer login/profile code and workflow changes, keep the partial Firestore rules out of deployment scope, run the actual static CI, and then review the new PR's complete diff. The existing PR should remain as historical evidence until that replacement is verified.
+
+## Step 74 gate table
+
+| Gate | Result |
+|---|---|
+| PR #4 changed-file inventory | PASS |
+| Base/head comparison obtained | PASS |
+| PR #4 branches in sync | **FAIL — DIVERGED (53 ahead / 5 behind)** |
+| Exact conflict hunks resolved | NOT DONE / not exposed by current tools |
+| Draft rules safe for shared deployment | **NO** |
+| PR #4 ready to merge | **NO — BLOCKED** |
+| Production Firebase settings or rules changed | NO |
+
+Only this audit report was changed in Step 74. No application code, branches, workflow, Firestore rules, Firebase Console settings, or production data were modified.
+
