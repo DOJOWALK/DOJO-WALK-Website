@@ -239,3 +239,29 @@ This confirms the existing static validation pipeline is active for this commit.
 - Production rules deployed: **NO**
 
 Next safe action: obtain a complete branch tree/workflow file inventory, then add a separate Emulator test job and test-only shared rules fixture only after the canonical shared rules have been reviewed. Do not reinterpret the static CI pass as Firebase security-test success.
+
+### Step 64: Repository-tree inventory attempt and safe test-job decision
+
+The exact workflow path and complete file tree could not be established through the available GitHub file actions in this pass. The directory request for `.github/workflows` correctly returned a directory-not-a-file error; the following *candidate file paths* returned 404 on the audited branch: `.github/workflows/ci.yml`, `.github/workflows/website-checks.yml`, `.github/workflows/customer-auth.yml`, `.github/workflows/customer-auth-integration.yml`, and `.github/workflows/validate.yml`. Additional candidate paths on `main` (`.github/workflows/main.yml`, `test.yml`, `checks.yml`, `website.yml`, `deploy.yml`, and `firebase.yml`) and root `package.json`/`package-lock.json` also returned 404. These checks are not a complete tree listing and do **not** prove that no workflow or package manifest exists under another name or on another ref.
+
+The GitHub code-search action returned no results for the workflow display name or its job title. That search is scoped to the repository's default branch, so it cannot by itself identify the workflow file responsible for the known run on the audit branch. The previously verified successful run (39245116423) remains evidence only for the static checks recorded in Step 63.
+
+#### Step 64 decision
+
+Do **not** create a guessed workflow file, introduce a second package manager, add Emulator configuration blindly, or test the current website-only rules as if they represented shared production rules. The safe next prerequisite is an actual recursive Git tree / directory listing for the exact audited branch (or the workflow file path from the successful run's metadata), followed by inspection of that workflow and a reviewed shared-rules candidate. The available GitHub actions exposed here do not provide a directory-list/tree endpoint, so this prerequisite remains blocked in this pass.
+
+| Gate | Result |
+|---|---|
+| Candidate workflow paths checked on audited branch | PASS (checked; none matched) |
+| Candidate workflow paths checked on `main` | PASS (checked; none matched) |
+| Complete recursive branch tree obtained | BLOCKED / NOT AVAILABLE THROUGH CURRENT FILE ACTIONS |
+| Exact workflow path identified | NOT VERIFIED |
+| Existing static CI evidence preserved | PASS (Step 63; run 39245116423) |
+| Emulator/test harness added | NO — intentionally not guessed |
+| Shared rules candidate approved | NO |
+| Emulator tests executed | NOT RUN |
+| Production rules or Firebase Console changed | NO |
+| Safe to deploy Firestore rules | NO — gate remains BLOCKED |
+
+No application code, workflow, package manifest, Firestore rules, Firebase Console settings, merges, or deployments were changed in Step 64; only this audit report was updated.
+
