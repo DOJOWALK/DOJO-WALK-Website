@@ -101,3 +101,11 @@ The website currently writes `name`, `gender`, `dateOfBirth` as a string, `age`,
 ## Result
 
 Static source-code checks only. This is not a live integration test, security certification, or production-readiness approval.
+
+## Step 21 — Login → profile navigation and session static review
+
+- Checked that the login page loads `customer-auth.js`, its form/button IDs match the script selectors, OTP confirmation calls Firebase Auth, and the auth-state listener exposes the profile link for an already signed-in session.
+- Checked that the profile page listens for Firebase Auth state, redirects signed-out users to `customer-login.html`, enables saving only when a user is signed in, uses the expected `profile-form`/save/sign-out element IDs, and sends a signed-out user back to login after sign-out.
+- No redirect loop was found in the inspected source: login intentionally offers a profile link rather than forcing an automatic redirect, while the protected profile redirects only when no session exists.
+- Corrected stale login copy that implied personal-profile saving was not implemented, and corrected the signed-in status text. Dog details and booking functionality remain unconnected.
+- Static string/selector/path inspection only. No browser execution, persisted-session test, real OTP, live Firestore operation, or Android end-to-end test was performed.
