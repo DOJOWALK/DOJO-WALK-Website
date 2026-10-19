@@ -441,3 +441,29 @@ The Partner checked-in rules also use their own field allowlists for user create
 
 No source code, Firestore rules, Firebase Console settings, PR state, or production environment was changed in Step 69; only this audit report was updated.
 
+# Step 70: Customer login/profile integration PR merge status
+
+On 2026-10-19, customer login/profile integration PR #5 was promoted from Draft to Ready for review and merged after checking its latest GitHub Actions static check run (run ID `39248019883`, conclusion `success`). The completed job `Syntax and DOM contract checks` validated external auth module syntax, extracted profile module syntax, HTML/local links, DOM selectors, and the profile-load safety guard.
+
+- Merge commit: `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`
+- **Target branch:** `feature/website-customer-profile-firestore` (not `main`).
+- PR files: `.github/workflows/customer-auth-integration-checks.yml`, `FIREBASE_WEB_READINESS_AUDIT.md`, `customer-auth.js`, `customer-login.html`, and `customer-profile.html`.
+
+## Step 70 result
+
+| Check | Result |
+|---|---|
+| Static CI for latest PR head | PASS (run 39248019883) |
+| PR #5 merged | PASS |
+| Integration code on target feature branch | PASS |
+| Integration code merged to `main` | NO — PR base is the profile-firestore feature branch |
+| Firebase live Phone Auth / SMS OTP | NOT VERIFIED |
+| Deployed shared Firestore rules compatibility | NOT VERIFIED |
+| Firestore Emulator security tests | NOT RUN |
+| Browser end-to-end test | NOT RUN |
+| Firestore rules or Firebase production deployment | NO |
+
+This merge advances the code integration but does not certify production readiness. Do not deploy Firestore rules from this branch. The known draft rules/schema compatibility findings from Step 69 remain unresolved until currently deployed rules are authoritatively inspected, the shared schema is agreed, and positive/negative Emulator tests pass.
+
+No Firebase Console settings or production data were changed in Step 70.
+
