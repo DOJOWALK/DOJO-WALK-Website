@@ -287,3 +287,15 @@ Static source-code checks only. This is not a live integration test, security ce
 - PR #4 remains open/draft and not mergeable. No merge, ref update, or deployment was performed.
 
 **Step 37 result:** Cross-file static checks passed for the listed source invariants; runtime/security validation and safe branch synchronization remain outstanding.
+
+
+## Step 38 — Review overlapping login changes for a safe integration plan
+
+- Compared the actual `customer-auth.js` and `customer-login.html` contents on PR #3's branch and PR #4's branch.
+- PR #3's branch still contains the old Existing/New account-type toggle; PR #4's branch removes that toggle. Keep the removal in the intended integrated version.
+- PR #4 adds the Change Number / Restart control, clears reCAPTCHA after sign-out and while idle signed-out, and keeps the phone field locked while an OTP confirmation is pending. Those behaviors must be preserved.
+- The signed-in guidance differs slightly between branches; both versions correctly say dog details and bookings are not connected. Keep the clearer profile guidance from the PR #4 version.
+- This is a source-level conflict-resolution plan, not a Git merge. The available connector exposes no verified branch-tree retrieval/normal merge workflow, so no synthetic merge commit or branch ref update was attempted.
+- PR #4 remains open/draft and GitHub reports it as not mergeable. No PR was merged and no deployment or runtime tests were performed.
+
+**Step 38 result:** Identified which login changes to preserve during integration; actual Git-level synchronization remains blocked pending a Git-capable merge/rebase workflow.
