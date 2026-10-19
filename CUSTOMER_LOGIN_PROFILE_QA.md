@@ -185,3 +185,13 @@ Static source-code checks only. This is not a live integration test, security ce
 - No browser execution, live Firebase Auth test, real SMS/OTP, Firestore test, or Android test was run. No merge or deployment was performed.
 
 **Step 28 result:** The UI no longer implies that the Existing/New buttons control Firebase account creation. Runtime and shared-rules security checks remain pre-merge blockers.
+
+## Step 29 — PR dependency and branch-drift check
+
+- Compared PR #4's feature branch against its intended base, `feature/website-customer-login-structure`.
+- GitHub's compare result reports the feature branch has 38 commits ahead and 3 commits behind the current base branch. The changed paths include `customer-auth.js` and `customer-login.html`, so this is a real branch-history divergence to resolve before merging.
+- PR #4 currently reports `mergeable: false`; PR #2 and PR #3 still report mergeable. PR #4 remains open/draft/unmerged.
+- No PR was merged, no branch was force-pushed, and no deployment was performed. The safe next step is to synchronize PR #4 with its current base and review any conflicts, then re-check GitHub mergeability. Do not bypass this by merging PR #4 directly into main.
+- Runtime blockers remain: actual SMS/reCAPTCHA, browser/Android testing, Firestore Emulator/live profile checks, and full shared-project rules audit. The partial Firestore rules must not be deployed as-is.
+
+**Step 29 result:** A branch-sync blocker was found. Do not merge PR #4 until its base-branch divergence is resolved and mergeability is re-checked.
