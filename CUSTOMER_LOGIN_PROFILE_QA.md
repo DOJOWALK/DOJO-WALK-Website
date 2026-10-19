@@ -12,9 +12,16 @@ Date: 2026-10-19
 - Status messages are rendered using `textContent`, not HTML injection.
 - Login page includes the expected form, phone, OTP, reCAPTCHA, action, and next-step elements.
 - Profile page checks that a Firebase user is signed in before saving.
-- Profile form checks age is between 18 and 120.
+- Profile form checks age is between 18 and 120 in client-side code.
 - Profile writes to `users/{currentUser.uid}` with merge enabled.
 - Static check confirms the profile page and rules use the same owner-scoped user document path.
+- Draft PR #4 exists and remains open/draft: https://github.com/dojoplatform2026/DOJO-WALK-Website-/pull/4
+
+## Security review findings
+
+- The `age` value is calculated/validated in client-side code and supplied with the write. A modified client could potentially submit an age that does not match `dateOfBirth`. Do not treat this field as proof of age for legal or eligibility decisions. A trusted server-side validation or a rules design that reliably verifies the date-of-birth cutoff is needed before enforcing age eligibility.
+- The current draft `firestore.rules` denies every collection other than `users/{userId}`. Since Firestore rules apply to the shared database, deploying this draft without auditing the customer app, partner app, admin portal, and existing collections could break them.
+- The rules restrict updates to a set of profile fields, but they have not been run through Firebase Emulator tests or deployed-rule tests.
 
 ## Not tested — do not claim these work yet
 
@@ -28,10 +35,10 @@ Date: 2026-10-19
 ## Deployment blockers
 
 1. The GitHub Pages deployment workflow runs from `main`; feature branch changes are not live until reviewed and merged.
-2. The profile branch contains a draft Firestore ruleset that denies access to all collections except `users/{userId}`. This could break other apps using the same Firebase database. Do not deploy those rules until the full shared-project ruleset is audited and tested.
+2. The draft Firestore ruleset must not be deployed until the full shared-project ruleset is audited and tested.
 3. Customer login/profile changes are in feature branches and are not live.
-4. A Draft PR for the profile branch has not been successfully created.
+4. PR #4 is open as a draft and has not been merged.
 
 ## Result
 
-Static checks passed for the listed source-code patterns only. This is not a live integration test, security certification, or production-readiness approval.
+Static source-code checks only. This is not a live integration test, security certification, or production-readiness approval.
