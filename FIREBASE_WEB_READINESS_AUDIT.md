@@ -138,3 +138,52 @@ Fetched and compared the exact checked-in files again:
 No rules were changed or deployed. Do not run `firebase deploy --only firestore:rules` from either repository as a workaround. The next safe action is for an authorized project operator to export/copy the active rules for the confirmed project, then run emulator tests against a reconciled shared ruleset. Never share service-account keys or private credentials in chat.
 
 **Step 60 status:** source-level deployment-safety gate documented; live Firebase rules remain unverified because repository access cannot prove deployed configuration.
+
+
+
+### Step 61: Firestore Emulator test plan (plan only; tests not run)
+
+This step records the required test matrix and setup gaps before any shared Firestore rules are changed. It does **not** introduce a replacement ruleset, alter application payloads, start an Emulator, or deploy anything.
+
+#### Repository setup inspection
+
+- The branch's `firebase.json` (blob SHA `0207c3fc808f51c418117f7e1facf13cf1a32b71`) currently configures only `firestore.rules`; it has no checked-in Firestore Emulator port or emulator-specific configuration.
+- The branch's `firestore.rules` (blob SHA `1e94b14ec855dd0450d30b735b02859be13b3331`) is the website-only draft that denies every collection except owner-scoped `users/{uid}`. It is **not** a valid basis for testing the complete shared production flows.
+- This inspection did not establish a working Node test harness or a complete shared rules fixture. Before test implementation, inspect the repository file tree and any existing package/CI configuration directly; do not assume a test runner or add duplicate setup blindly.
+
+#### Required test matrix
+
+Tests must run against a separately reviewed, complete shared rules candidate in the Firestore Emulator—not against production and not against the current website-only draft as if it were the shared ruleset.
+
+| Area | Allowed test cases | Denial / invalid test cases |
+|---|---|---|
+| Profile `users/{uid}` | Signed-in owner reads their profile; Website create/update payload; Flutter Customer create/update payload; server timestamps accepted where expected; preserve existing unknown/shared fields during allowed updates | Signed-out read/write; user A reads or writes user B's profile; forged `uid`; role escalation; invalid/missing required fields; client rewrites immutable `createdAt`; invalid `updatedAt`; out-of-policy field changes |
+| Pets `users/{uid}/pets/{petId}` | Owner CRUD with the actual serialized pet model and allowed optional fields | Cross-user CRUD; signed-out access; malformed values; unexpected protected fields |
+| Addresses `users/{uid}/addresses/{addressId}` | Owner CRUD with exact serialized field names; create/update default address; multi-document batch that clears old default and sets new default | Cross-user access; invalid address values; batch where any unauthorized document is touched; multiple defaults if the agreed model forbids them |
+| Booking `bookings/{bookingId}` | Customer creates the observed pending booking payload; owner reads own booking; valid cancellation-request transition; timestamps and optional regular/custom schedule fields | Signed-out create/read; customer spoofs another `customerId`; invalid status or protected assignment fields; customer changes walker assignment or walk progress; cross-customer read/update |
+| Walker operations | Assigned walker reads the booking and makes only permitted walk-state/progress updates; route/progress data follows agreed schema | Unassigned walker updates booking; walker changes customer, price, booking schedule, or assignment; one walker accesses another walker's restricted data |
+| `walk_requests` | Test the explicitly approved product decision once its use is confirmed | Deny all reads/writes if the collection remains intentionally disabled; do not accidentally break a live flow without first confirming its intended status |
+| Admin and operations | Authorized active admin performs approved booking, user-support, coupon, zone/service-location, and audit operations according to role | Non-admin or inactive admin cannot perform admin writes; ordinary users cannot edit `admin_users`, payments, audit logs, service locations, zones, or other privileged records |
+| Shared collections | Verify explicit permissions for `walkers`, `walker_reviews`, `customers`, `coupons`, `payments`, `audit_logs`, `zones`, and service-location collections (`service_countries`, `service_states`, `service_cities`, `service_areas`, `service_localities`, import/index collections) | Default deny for every undocumented operation; no catch-all permission accidentally grants access |
+
+#### Test implementation requirements
+
+1. Obtain and review an export/copy of the **currently deployed** rules for Firebase project `dojo-platform-b68a3`; confirm provenance and date with the authorized project operator.
+2. Agree the canonical shared schema and role/ownership transitions across Customer, Partner, and Admin. Confirm whether `gender` is required, whether `age` is stored or derived, and exact address/pet serialization names.
+3. Add or reuse an isolated Emulator configuration and a test harness only after inspecting the full branch tree. Pin compatible Firebase CLI, `@firebase/rules-unit-testing`, and Firebase SDK versions in the repository's chosen package manager.
+4. Load the reviewed candidate rules into the Emulator. Seed fixtures using test-only setup that bypasses rules; never use production customer records.
+5. Implement positive and negative assertions from the matrix, including two distinct customer identities, two walker identities, an authorized admin, an inactive admin, and unauthenticated requests.
+6. Include regressions for website and Flutter profile payloads, pet/address CRUD, default-address batch writes, booking create/read/cancel, assigned-walker-only changes, and admin-only writes.
+7. Run the tests and report the exact command, counts, failures, and CI run URL. A successful syntax check is not an Emulator test.
+8. Keep production deployment blocked until all required tests pass, an owner reviews the full diff, and the authorized operator separately verifies the target project and planned deployment.
+
+#### Step 61 status
+
+- Emulator test plan documented: **PASS**
+- Emulator configuration and test harness verified: **NOT VERIFIED**
+- Emulator tests executed: **NOT RUN**
+- Canonical shared rules/schema approved: **NOT COMPLETE**
+- Production rules deployed: **NO**
+- Deployment authorization gate: **BLOCKED**
+
+No rules, Firebase Console settings, app payloads, branches other than this audit branch, merges, or deployments were changed in this step.
