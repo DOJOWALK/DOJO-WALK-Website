@@ -11,7 +11,7 @@ Date: 2026-10-19
 - Sign-out uses Firebase Auth `signOut`.
 - Status messages are rendered using `textContent`, not HTML injection.
 - Login page includes the expected form, phone, OTP, reCAPTCHA, action, and next-step elements.
-- Profile page checks that a Firebase user is signed in before saving.
+- Profile page checks Firebase Auth state and redirects signed-out visitors to customer login; save is guarded by the current signed-in user.
 - Profile form checks age is between 18 and 120 in client-side code.
 - Profile writes to `users/{currentUser.uid}` with merge enabled.
 - Static check confirms the profile page and rules use the same owner-scoped user document path.
