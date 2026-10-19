@@ -7,32 +7,41 @@ service cloud.firestore {
         return request.auth != null && request.auth.uid == userId;
       }
 
-      function validProfile() {
+      function validProfileFields() {
+        return request.resource.data.name is string
+          && request.resource.data.name.size() >= 2
+          && request.resource.data.name.size() <= 100
+          && request.resource.data.gender is string
+          && request.resource.data.dateOfBirth is string
+          && request.resource.data.age is int
+          && request.resource.data.age >= 18
+          && request.resource.data.age <= 120
+          && request.resource.data.phoneNumber is string
+          && request.resource.data.phoneNumber == request.auth.token.phone_number
+          && request.resource.data.email is string
+          && request.resource.data.photoUrl is string
+          && request.resource.data.updatedAt == request.time;
+      }
+
+      // New profile documents may contain only the fields managed by this website.
+      function validNewProfile() {
         return request.resource.data.keys().hasOnly([
-          'name',
-          'gender',
-          'dateOfBirth',
-          'age',
-          'phoneNumber',
-          'email',
-          'photoUrl',
-          'updatedAt'
-        ])
-        && request.resource.data.name is string
-        && request.resource.data.name.size() >= 2
-        && request.resource.data.name.size() <= 100
-        && request.resource.data.gender is string
-        && request.resource.data.dateOfBirth is string
-        && request.resource.data.age is int
-        && request.resource.data.phoneNumber is string
-        && request.resource.data.phoneNumber == request.auth.token.phone_number
-        && request.resource.data.email is string
-        && request.resource.data.photoUrl is string
-        && request.resource.data.updatedAt == request.time;
+          'name', 'gender', 'dateOfBirth', 'age', 'phoneNumber',
+          'email', 'photoUrl', 'updatedAt'
+        ]) && validProfileFields();
+      }
+
+      // Preserve any existing shared-schema fields that this website does not change.
+      function validProfileUpdate() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name', 'gender', 'dateOfBirth', 'age', 'phoneNumber',
+          'email', 'photoUrl', 'updatedAt'
+        ]) && validProfileFields();
       }
 
       allow read: if isOwner();
-      allow create, update: if isOwner() && validProfile();
+      allow create: if isOwner() && validNewProfile();
+      allow update: if isOwner() && validProfileUpdate();
       allow delete: if false;
     }
 
