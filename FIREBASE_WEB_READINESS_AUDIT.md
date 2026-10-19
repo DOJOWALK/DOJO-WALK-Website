@@ -3,7 +3,7 @@
 **Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** The source review and static CI checks have passed, but this is not a complete live Firebase validation and the shared Firestore rules must not be deployed.
 
 - **Target Firebase project:** `dojo-platform-b68a3`.
-- **Latest completed audit step:** Step 64 (repository-tree/workflow inventory attempt).
+- **Latest completed audit step:** Step 66 (Customer Auth account-choice behavior review).
 - **Static CI evidence:** run `39245116423` completed successfully for the checks described in Step 63. These checks cover source syntax and DOM/local-link contracts, not Firebase authorization.
 - **Known source-level risks:** the Website's checked-in draft rules only permit owner-scoped `users/{uid}` access and deny other collections; the checked-in Partner rules have profile-field allowlist mismatches and explicitly deny booking creation. Neither file has been verified as the rules currently deployed to Firebase.
 - **Not verified:** deployed Firestore rules, Firebase Console Phone Auth/authorized domains, live SMS OTP, Firestore Emulator permissions, browser end-to-end flows, and full Customer/Partner/Admin rules compatibility.
@@ -309,4 +309,35 @@ The separate static website workflow run `39248139248` was also checked and comp
 | Safe to deploy Firestore rules | NO |
 
 **Next safe action:** do not add an Emulator job using the website-only draft rules. First obtain/confirm the authorized project's currently deployed rules and agree a complete shared rules candidate covering Customer, Partner, and Admin; then add isolated Emulator tests against that reviewed candidate. No Firebase Console settings, production rules, app source, or PR #5 state were changed in Step 65.
+
+# Step 66: Customer Auth account-choice behavior review
+
+Reviewed the actual `customer-auth.js` source on `feature/website-customer-auth-profile-integration` (blob SHA `f618eacc4290a45d3c8148d0245a8e2f2a2b0a69`) against the login page's Existing user / New user selector.
+
+#### Finding: account selector changes presentation, not authentication behavior
+
+- Both selector buttons call `selectAccountType(false/true)`, which only changes `isNewUser`, button state, title, hint text, and status copy.
+- Both paths then call the same `signInWithPhoneNumber(auth, "+91" + digits, recaptchaVerifier)` function and verify with `confirmationResult.confirm(code)`.
+- The source does not check whether the phone number already has a customer profile before describing the flow as Existing user or New user. It also does not create the profile document at the moment of OTP verification; it links the user to the separate profile page.
+- Firebase Phone Authentication sign-in can authenticate an existing account and can create an account for a previously unseen phone number. Therefore, the selector currently acts as a UI hint, not a guaranteed account-type enforcement or account-existence check.
+
+#### Required product decision / safe correction
+
+Avoid presenting the two choices as if they perform different backend operations unless that behavior is implemented and tested. A safer option is to label the page “Continue with phone” and let the verified UID determine whether `users/{uid}` already has a profile; existing profiles can continue to the profile/home flow, and missing profiles can be directed to profile setup. Do not use phone-number lookup APIs or disclose whether another person's phone number has an account. Keep profile reads/writes owner-scoped.
+
+Before changing behavior, confirm the intended post-login destination and whether the website should redirect automatically after OTP or keep the current “Complete your customer profile” link. No auth source code was changed in this audit step.
+
+| Gate | Result |
+|---|---|
+| Account selector source path inspected | PASS |
+| Existing/New selector has separate backend behavior | NO — UI-only |
+| OTP verification source identified | PASS |
+| Profile creation occurs automatically at OTP verification | NO — separate profile page |
+| Live Firebase Auth behavior tested | NOT RUN |
+| Browser E2E tested | NOT RUN |
+| Firestore deployed rules verified | NOT VERIFIED |
+| Safe to deploy shared rules | NO |
+| App/auth code changed | NO — report-only review |
+
+**Step 66 status:** source behavior finding documented; no Firebase Console changes, rules changes, live OTP tests, or deployments performed.
 
