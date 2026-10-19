@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // A customer may access only their own profile document.
+    match /users/{userId} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      function validProfile() {
+        return request.resource.data.keys().hasOnly([
+          'name',
+          'gender',
+          'dateOfBirth',
+          'age',
+          'phoneNumber',
+          'email',
+          'photoUrl',
+          'updatedAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.gender is string
+        && request.resource.data.dateOfBirth is string
+        && request.resource.data.age is int
+        && request.resource.data.phoneNumber is string
+        && request.resource.data.phoneNumber == request.auth.token.phone_number
+        && request.resource.data.email is string
+        && request.resource.data.photoUrl is string
+        && request.resource.data.updatedAt == request.time;
+      }
+
+      allow read: if isOwner();
+      allow create, update: if isOwner() && validProfile();
+      allow delete: if false;
+    }
+
+    // Deny access to every collection until its rules are explicitly designed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
