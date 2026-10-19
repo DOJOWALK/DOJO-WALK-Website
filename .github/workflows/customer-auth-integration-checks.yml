@@ -33,7 +33,7 @@ jobs:
           import sys
 
           source = pathlib.Path("customer-profile.html").read_text(encoding="utf-8")
-          match = re.search(r'<script type="module">([\\s\\S]*?)</script>', source, re.I)
+          match = re.search(r'<script type="module">([\s\S]*?)</script>', source, re.I)
           if not match:
               print("ERROR: customer-profile.html has no inline module script")
               sys.exit(1)
@@ -56,11 +56,11 @@ jobs:
                   errors.append(f"Missing page: {page}")
                   continue
               html = path.read_text(encoding="utf-8")
-              ids = re.findall(r'\\bid=["\\']([^"\\']+)["\\']', html)
+              ids = re.findall(r'\bid=["\']([^"\']+)["\']', html)
               duplicates = sorted({item for item in ids if ids.count(item) > 1})
               if duplicates:
                   errors.append(f"{page}: duplicate IDs: {', '.join(duplicates)}")
-              for src in re.findall(r'<script[^>]+src=["\\']([^"\\']+)["\\']', html, re.I):
+              for src in re.findall(r'<script[^>]+src=["\']([^"\']+)["\']', html, re.I):
                   if src.startswith(("https://", "http://", "//", "data:")):
                       continue
                   local_src = src.split("?", 1)[0].split("#", 1)[0]
@@ -69,8 +69,8 @@ jobs:
 
           login = (root / "customer-login.html").read_text(encoding="utf-8")
           auth = (root / "customer-auth.js").read_text(encoding="utf-8")
-          html_ids = set(re.findall(r'\\bid=["\\']([^"\\']+)["\\']', login))
-          js_ids = set(re.findall(r'getElementById\\(["\\']([^"\\']+)["\\']\\)', auth))
+          html_ids = set(re.findall(r'\bid=["\']([^"\']+)["\']', login))
+          js_ids = set(re.findall(r'getElementById\(["\']([^"\']+)["\']\)', auth))
           for missing in sorted(js_ids - html_ids):
               errors.append(f"customer-auth.js references missing login DOM id: {missing}")
           for required in ("existing-user", "new-user", "change-number-button", "customer-login-form", "phone", "otp-code", "recaptcha-container", "auth-button"):
@@ -81,7 +81,7 @@ jobs:
               if required not in profile:
                   errors.append(f"customer-profile.html missing load-safety guard: {required}")
           if errors:
-              print("\\n".join("ERROR: " + item for item in errors))
+              print("\n".join("ERROR: " + item for item in errors))
               sys.exit(1)
           print("Customer auth/profile syntax, DOM, local script, and load-safety checks passed.")
           print("Note: Firebase network behavior, SMS OTP, Firestore Rules, and browser E2E are not tested.")
