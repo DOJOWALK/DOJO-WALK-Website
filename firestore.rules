@@ -8,11 +8,12 @@ service cloud.firestore {
       }
 
       function validProfileFields() {
-        return request.resource.data.name is string
+        return request.resource.data.uid == request.auth.uid
+          && request.resource.data.name is string
           && request.resource.data.name.size() >= 2
           && request.resource.data.name.size() <= 100
           && request.resource.data.gender is string
-          && request.resource.data.dateOfBirth is string
+          && request.resource.data.dateOfBirth is timestamp
           && request.resource.data.age is int
           && request.resource.data.age >= 18
           && request.resource.data.age <= 120
@@ -20,22 +21,25 @@ service cloud.firestore {
           && request.resource.data.phoneNumber == request.auth.token.phone_number
           && request.resource.data.email is string
           && request.resource.data.photoUrl is string
+          && request.resource.data.role == 'customer'
+          && request.resource.data.profileCompleted == true
+          && request.resource.data.createdAt is timestamp
           && request.resource.data.updatedAt == request.time;
       }
 
       // New profile documents may contain only the fields managed by this website.
       function validNewProfile() {
         return request.resource.data.keys().hasOnly([
-          'name', 'gender', 'dateOfBirth', 'age', 'phoneNumber',
-          'email', 'photoUrl', 'updatedAt'
+          'uid', 'name', 'gender', 'dateOfBirth', 'age', 'phoneNumber',
+          'email', 'photoUrl', 'role', 'profileCompleted', 'createdAt', 'updatedAt'
         ]) && validProfileFields();
       }
 
       // Preserve any existing shared-schema fields that this website does not change.
       function validProfileUpdate() {
         return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'name', 'gender', 'dateOfBirth', 'age', 'phoneNumber',
-          'email', 'photoUrl', 'updatedAt'
+          'uid', 'name', 'gender', 'dateOfBirth', 'age', 'phoneNumber',
+          'email', 'photoUrl', 'role', 'profileCompleted', 'createdAt', 'updatedAt'
         ]) && validProfileFields();
       }
 
