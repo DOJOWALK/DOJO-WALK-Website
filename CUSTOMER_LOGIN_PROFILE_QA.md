@@ -66,6 +66,14 @@ The website currently writes `name`, `gender`, `dateOfBirth` as a string, `age`,
 - The rules expect a phone-auth token phone number to match `phoneNumber`; actual behavior still needs Firebase Emulator/live Auth testing, especially for accounts whose auth token lacks that claim.
 - Static source review only; no real Firebase read/write, browser, emulator, or Android test was run.
 
+## Step 19 — Auth claim and Firestore field compatibility
+
+- Added a client-side guard: if Firebase Auth does not expose a verified `currentUser.phoneNumber`, the website now stops before writing and asks the user to sign in again. It no longer sends an empty phone number that would fail the draft rule's token-claim comparison.
+- The saved phone number now comes directly from the signed-in Firebase user. The Firestore rule still enforces equality with `request.auth.token.phone_number`; this has not been proven against the live project's token or emulator.
+- Improved `createdAt` handling: preserve an existing value when it looks like a Firestore Timestamp; otherwise, replace a missing/malformed value with a server timestamp so the draft rule's type check can pass.
+- These are defensive static-code changes only. No live Firebase Auth claim inspection or Firestore Emulator test was performed.
+- Security reminder: this draft rules file denies all collections other than `users/{uid}`; do not deploy it to the shared Firebase project as-is.
+
 ## Not tested — do not claim these work yet
 
 - Real SMS delivery and OTP verification on the deployed GitHub Pages domain.
