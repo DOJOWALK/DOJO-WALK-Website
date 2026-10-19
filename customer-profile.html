@@ -45,6 +45,7 @@ const signoutButton = document.getElementById("signout");
 const accountLine = document.getElementById("account-line");
 let currentUser = null;
 let savedPhotoUrl = "";
+let profileLoadComplete = false;
 
 function status(message, kind = "info") {
   statusBox.textContent = message;
@@ -91,7 +92,8 @@ function dateOfBirthInputValue(value) {
 
 onAuthStateChanged(auth, async user => {
   currentUser = user;
-  saveButton.disabled = !user;
+  profileLoadComplete = false;
+  saveButton.disabled = true;
   signoutButton.hidden = !user;
   if (!user) {
     accountLine.textContent = "You are not signed in.";
@@ -112,14 +114,19 @@ onAuthStateChanged(auth, async user => {
       document.getElementById("gender").value = data.gender || "";
       document.getElementById("dob").value = dateOfBirthInputValue(data.dateOfBirth);
       savedPhotoUrl = data.photoUrl || "";
+      profileLoadComplete = true;
       status("Your saved profile was loaded.", "success");
       saveButton.textContent = "Update profile";
+      saveButton.disabled = false;
     } else {
+      profileLoadComplete = true;
       status("Welcome! Complete the form to create your customer profile.");
+      saveButton.disabled = false;
     }
   } catch (error) {
     console.error("Profile load failed", error);
-    status("Could not load your profile. Check your connection and Firestore rules, then retry.", "error");
+    status("Could not load your profile. Saving is disabled to protect existing data. Refresh the page after checking your connection and Firestore rules.", "error");
+    saveButton.disabled = true;
   }
 });
 
@@ -127,6 +134,11 @@ form.addEventListener("submit", async event => {
   event.preventDefault();
   if (!currentUser) {
     status("Please sign in first.", "error");
+    return;
+  }
+  if (!profileLoadComplete) {
+    saveButton.disabled = true;
+    status("Your saved profile has not loaded yet. Refresh after checking your connection and Firestore rules; saving is blocked to protect existing data.", "error");
     return;
   }
   const name = document.getElementById("name").value.trim();
@@ -183,7 +195,8 @@ form.addEventListener("submit", async event => {
     console.error("Profile save failed", error);
     status("Profile was not saved. Check Firestore is enabled and rules allow the signed-in user to update only their own users/{uid} document.", "error");
   } finally {
-    saveButton.disabled = !currentUser;
+    // Save stays available only after the initial profile read succeeded.
+    saveButton.disabled = !currentUser || !profileLoadComplete;
   }
 });
 
