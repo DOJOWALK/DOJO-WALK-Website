@@ -23,7 +23,7 @@ jobs:
           python-version: "3.x"
 
       - name: Validate HTML and JavaScript references
-        shell: python
+        shell: python {0}
         run: |
           import pathlib
           import re
@@ -58,9 +58,6 @@ jobs:
                   errors.append(f"customer-auth.js references missing login DOM id: {missing_id}")
               if "customer-login-form" not in html_ids:
                   errors.append("Login form id is missing")
-              if "Change number" in html and "change-number" not in html.lower():
-                  print("Note: review the change-number control label if its markup changes.")
-
           if errors:
               print("\n".join(f"ERROR: {item}" for item in errors))
               sys.exit(1)
