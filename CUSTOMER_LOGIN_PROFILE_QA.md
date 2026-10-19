@@ -12,6 +12,7 @@ Date: 2026-10-19
 - Status messages are rendered using `textContent`, not HTML injection.
 - Login page includes the expected form, phone, OTP, reCAPTCHA, action, and next-step elements.
 - Profile page checks Firebase Auth state and redirects signed-out visitors to customer login; save is guarded by the current signed-in user.
+- Login page shows the customer-profile next-step link after Firebase reports a signed-in user; OTP success messaging now directs the user to the profile step. This is static review only; click-through and browser session restoration were not tested.
 - Profile form checks age is between 18 and 120 in client-side code.
 - Profile writes to `users/{currentUser.uid}` with merge enabled.
 - Static check confirms the profile page and rules use the same owner-scoped user document path.
