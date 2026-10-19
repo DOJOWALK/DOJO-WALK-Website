@@ -264,3 +264,14 @@ Static source-code checks only. This is not a live integration test, security ce
 - PR #4 remains open/draft and GitHub currently reports it as not mergeable; branch synchronization is still blocked.
 
 **Step 35 result:** Security test plan committed and verified; actual Emulator execution and branch synchronization remain outstanding.
+
+
+## Step 36 — Recheck PR branch ancestry before synchronization
+
+- Re-fetched PR #3 and PR #4 metadata and compared the PR #4 feature branch against the PR #3 branch and the recorded common ancestor.
+- The comparison API reports the PR #3 branch has three commits beyond the recorded common ancestor, touching only `customer-auth.js` and `customer-login.html`; these overlap the profile branch's auth/login edits and must not be blindly overwritten.
+- GitHub PR metadata and compare responses are not fully consistent about the current base SHA/branch ancestry during this check. PR #4 is still reported `mergeable: false`, so no merge tree or branch ref was changed.
+- A safe synchronization requires a Git-capable environment to fetch both branch tips, perform a normal merge/rebase with conflict review, run the static and runtime tests, and push the resulting commit. Do not force-push or synthesize a tree without verifying the exact branch trees.
+- No PR was merged, no branch ref was moved, and no Firebase deployment or runtime test was performed.
+
+**Step 36 result:** Branch ancestry rechecked; overlapping auth/login changes and inconsistent PR metadata confirmed as blockers to safe automated synchronization.
