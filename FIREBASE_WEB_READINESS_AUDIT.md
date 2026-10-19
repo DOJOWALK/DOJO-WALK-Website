@@ -3,7 +3,7 @@
 **Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** The source review and static CI checks have passed, but this is not a complete live Firebase validation and the shared Firestore rules must not be deployed.
 
 - **Target Firebase project:** `dojo-platform-b68a3`.
-- **Latest completed audit step:** Step 64 (repository-tree/workflow inventory attempt).
+- **Latest completed audit step:** Step 73 (PR merge sequencing and exclusion of unapproved Firestore deployment files).
 - **Static CI evidence:** run `39245116423` completed successfully for the checks described in Step 63. These checks cover source syntax and DOM/local-link contracts, not Firebase authorization.
 - **Known source-level risks:** the Website's checked-in draft rules only permit owner-scoped `users/{uid}` access and deny other collections; the checked-in Partner rules have profile-field allowlist mismatches and explicitly deny booking creation. Neither file has been verified as the rules currently deployed to Firebase.
 - **Not verified:** deployed Firestore rules, Firebase Console Phone Auth/authorized domains, live SMS OTP, Firestore Emulator permissions, browser end-to-end flows, and full Customer/Partner/Admin rules compatibility.
@@ -279,3 +279,29 @@ Do **not** create a guessed workflow file, introduce a second package manager, a
 
 No application code, workflow, package manifest, Firestore rules, Firebase Console settings, merges, or deployments were changed in Step 64; only this audit report was updated.
 
+
+
+### Step 73: Promote website work safely and exclude unapproved Firestore deployment files
+
+After checking PR state, the following source-control actions were completed:
+
+- PR #2 (homepage polish) was marked ready and merged to `main`; merge commit `08f3b5640cf6f45bcc1aa100e5bb84ab2ea5567e`. Its static website workflow run `39176442781` completed successfully.
+- PR #3 (customer login structure) was retargeted to `main`, marked ready, and merged; merge commit `412851dac380de9f1f0ce9be6d85be1457af317c`. The current-head workflow-run query returned no run for its head commit, so its CI status is **NOT VERIFIED**. Source was reviewed, but no live OTP/browser test is claimed.
+- PR #5 (customer auth/profile integration) had already merged into the profile feature branch; it was not separately merged to `main` by this step.
+- Before promoting the profile integration, the unapproved Website-only `firebase.json` and `firestore.rules` were deleted from `feature/website-customer-profile-firestore`. This prevents the Website-only rules draft from being included in the final profile PR diff. This is a repository change only; no deployed Firebase rules were changed.
+- The profile QA and security deployment documentation were updated to describe the current gate. The shared ruleset remains unapproved and untested.
+
+| Gate | Result |
+|---|---|
+| PR #2 merged to main | PASS |
+| PR #3 merged to main | PASS; current-head CI not verified |
+| PR #5 integrated into profile feature branch | PASS |
+| Website-only draft rules and firebase.json excluded from profile branch | PASS |
+| Current deployed Firestore rules retrieved | NOT VERIFIED |
+| Shared Customer/Partner/Admin rules approved | NO |
+| Emulator security tests | NOT RUN |
+| Live Phone OTP / browser E2E | NOT RUN |
+| PR #4 profile integration promoted to main | PENDING |
+| Production rules deployment | NO — intentionally blocked |
+
+**Step 73 result:** homepage and login structure are in `main`; profile integration still needs a conflict/mergeability check and its final PR. Production Firebase readiness remains incomplete.
