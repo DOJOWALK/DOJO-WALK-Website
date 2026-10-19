@@ -58,6 +58,14 @@ The website currently writes `name`, `gender`, `dateOfBirth` as a string, `age`,
 - Static source checks only. These rules are still a draft: they deny every other collection, have not been emulator-tested, and must not be deployed to the shared Firebase project without full ruleset integration/review.
 - The `age` field remains client-calculated; these rules only validate its type/range and do not prove it matches dateOfBirth. Do not use it as trusted age verification.
 
+## Step 18 — Profile save/load static review
+
+- Found and fixed a date-input compatibility bug: the website previously assigned Firestore `dateOfBirth` directly to an HTML date input. Since the value is now a Firestore Timestamp, that can fail to populate the date field.
+- Added a conversion helper that accepts the canonical Firestore Timestamp and legacy `YYYY-MM-DD` string format, converts valid values to the date input format, and leaves unsupported/invalid values blank.
+- Reviewed save flow: it reads the existing document, preserves `createdAt` when present, sets it when missing, and performs a merge write.
+- The rules expect a phone-auth token phone number to match `phoneNumber`; actual behavior still needs Firebase Emulator/live Auth testing, especially for accounts whose auth token lacks that claim.
+- Static source review only; no real Firebase read/write, browser, emulator, or Android test was run.
+
 ## Not tested — do not claim these work yet
 
 - Real SMS delivery and OTP verification on the deployed GitHub Pages domain.
