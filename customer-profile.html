@@ -32,7 +32,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
@@ -130,16 +130,25 @@ form.addEventListener("submit", async event => {
   status("Saving your profile securely…");
   try {
     const ref = doc(db, "users", currentUser.uid);
-    await setDoc(ref, {
+    const existingSnapshot = await getDoc(ref);
+    const profileData = {
+      uid: currentUser.uid,
       name,
       gender: gender || "",
-      dateOfBirth,
+      // Match the Flutter Customer app: store dateOfBirth as Firestore Timestamp.
+      dateOfBirth: Timestamp.fromDate(new Date(dateOfBirth + "T00:00:00")),
       age,
       phoneNumber: currentUser.phoneNumber || "",
       email: currentUser.email || "",
       photoUrl: savedPhotoUrl,
+      role: "customer",
+      profileCompleted: true,
       updatedAt: serverTimestamp()
-    }, { merge: true });
+    };
+    if (!existingSnapshot.exists() || !existingSnapshot.data()?.createdAt) {
+      profileData.createdAt = serverTimestamp();
+    }
+    await setDoc(ref, profileData, { merge: true });
     status("Profile saved successfully.", "success");
     saveButton.textContent = "Update profile";
   } catch (error) {
