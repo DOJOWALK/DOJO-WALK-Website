@@ -76,7 +76,10 @@ onAuthStateChanged(auth, async user => {
   signoutButton.hidden = !user;
   if (!user) {
     accountLine.textContent = "You are not signed in.";
-    status("Please sign in with your verified mobile number before saving a profile.", "error");
+    status("Please sign in with your verified mobile number. Redirecting to customer login…", "error");
+    // Firebase invokes this listener after restoring the persisted session.
+    // Use replace so Back does not reopen a protected profile form.
+    window.location.replace("customer-login.html");
     return;
   }
   accountLine.textContent = "Verified account: " + (user.phoneNumber || user.email || "signed in");
