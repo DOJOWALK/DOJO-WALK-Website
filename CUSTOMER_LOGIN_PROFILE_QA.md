@@ -253,3 +253,14 @@ Static source-code checks only. This is not a live integration test, security ce
 - PR #4 remains open/draft and branch synchronization with PR #3 remains unresolved. No merge, deployment, or live Firebase test was performed.
 
 **Step 34 result:** Cross-file static consistency checks completed; no production security approval granted.
+
+
+## Step 35 — Document required Firestore Emulator security matrix
+
+- Added an explicit test matrix to `FIRESTORE_SECURITY_DEPLOYMENT.md` covering unauthenticated access, owner vs cross-user access, valid profile writes, phone-claim mismatch, invalid age, DOB/age mismatch, protected `createdAt`, unexpected fields, deletes, and dependent customer/partner/admin collections.
+- The matrix clearly marks the DOB/age mismatch as a known gap in the current rules and says expected behavior must be enforced by the final design.
+- This is test planning/documentation only. No Emulator Suite was available or run in this step; none of the cases are marked as passed.
+- No rules were deployed, no branch history was rewritten, and no PR was merged.
+- PR #4 remains open/draft and GitHub currently reports it as not mergeable; branch synchronization is still blocked.
+
+**Step 35 result:** Security test plan committed and verified; actual Emulator execution and branch synchronization remain outstanding.
