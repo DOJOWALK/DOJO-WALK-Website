@@ -279,3 +279,34 @@ Do **not** create a guessed workflow file, introduce a second package manager, a
 
 No application code, workflow, package manifest, Firestore rules, Firebase Console settings, merges, or deployments were changed in Step 64; only this audit report was updated.
 
+### Step 65: Exact CI workflow located and static-vs-Firebase gate clarified
+
+The exact workflow path was recovered from the changed-file list for PR #5 and then fetched directly from the audited integration branch:
+
+- **Workflow:** `.github/workflows/customer-auth-integration-checks.yml`
+- **Workflow blob SHA on the integration branch:** `f4f2532bd99104fc8093b2c0472fcc4f2d9399ff`
+- **Trigger:** pull requests targeting `feature/website-customer-profile-firestore`, plus manual `workflow_dispatch`.
+- **Job:** `customer-auth-static` / “Syntax and DOM contract checks”.
+- **Checks present:** Node.js 22 syntax validation for `customer-auth.js`; extraction and syntax check of the inline profile module; duplicate HTML ID and local script checks; login DOM selector contract checks; profile-load safety guard checks.
+- **Explicitly not covered:** Firebase Emulator, Firestore Rules authorization, SMS OTP, authorized domains, real browser E2E, and production-deployed rules.
+
+This resolves the Step 64 workflow-path evidence gap for the known Customer Auth integration workflow. It does not establish a complete recursive repository-tree listing or a deployed Firebase rules snapshot.
+
+The separate static website workflow run `39248139248` was also checked and completed successfully. Its job validates HTML links, local assets, and preview forms. This is a separate static check and does not cover Firebase permissions.
+
+#### Step 65 gate
+
+| Gate | Result |
+|---|---|
+| Exact Customer Auth workflow path identified | PASS |
+| Workflow contents fetched and reviewed | PASS |
+| Static check scope documented | PASS |
+| Firebase Emulator tests present in this workflow | NO |
+| Shared Firestore rules fixture approved | NO |
+| Emulator authorization tests executed | NOT RUN |
+| Deployed production rules verified | NOT VERIFIED |
+| Safe to merge Customer Auth integration PR #5 | NOT YET — separate schema/rules and end-to-end checks remain unresolved |
+| Safe to deploy Firestore rules | NO |
+
+**Next safe action:** do not add an Emulator job using the website-only draft rules. First obtain/confirm the authorized project's currently deployed rules and agree a complete shared rules candidate covering Customer, Partner, and Admin; then add isolated Emulator tests against that reviewed candidate. No Firebase Console settings, production rules, app source, or PR #5 state were changed in Step 65.
+
