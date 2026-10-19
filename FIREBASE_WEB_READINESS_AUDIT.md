@@ -1,16 +1,17 @@
 ## Executive Summary — Current Status (2026-10-19)
 
-**Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** The source review and static CI checks have passed, but this is not a complete live Firebase validation and the shared Firestore rules must not be deployed.
+**Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** Source-level review and static CI checks have passed, but this is not a complete live Firebase validation and the shared Firestore rules must not be deployed.
 
 - **Target Firebase project:** `dojo-platform-b68a3`.
-- **Latest completed audit step:** Step 66 (Customer Auth account-choice behavior review).
-- **Static CI evidence:** run `39245116423` completed successfully for the checks described in Step 63. These checks cover source syntax and DOM/local-link contracts, not Firebase authorization.
-- **Known source-level risks:** the Website's checked-in draft rules only permit owner-scoped `users/{uid}` access and deny other collections; the checked-in Partner rules have profile-field allowlist mismatches and explicitly deny booking creation. Neither file has been verified as the rules currently deployed to Firebase.
-- **Not verified:** deployed Firestore rules, Firebase Console Phone Auth/authorized domains, live SMS OTP, Firestore Emulator permissions, browser end-to-end flows, and full Customer/Partner/Admin rules compatibility.
+- **Latest audit step:** Step 67 (auth integration CI workflow and account-selector behavior verified).
+- **Static CI evidence:** Customer Auth integration run `39248019883` completed successfully. It checks JS syntax, extracted profile-module syntax, HTML/local links/DOM selectors and the profile-load guard. It does not test Firebase authorization, real SMS OTP, or browser end-to-end behavior.
+- **Workflow path now identified:** `.github/workflows/customer-auth-integration-checks.yml` on the integration branch; it runs for pull requests targeting `feature/website-customer-profile-firestore` and supports manual dispatch.
+- **Known source-level risks:** Website draft rules only allow owner-scoped `users/{uid}` access and deny other collections; checked-in Partner rules have profile-field allowlist mismatches and explicitly deny booking creation. Neither checked-in file is verified as the rules currently deployed to Firebase.
+- **Not verified:** deployed Firestore rules, Firebase Console Phone Auth/authorized domains, live SMS OTP, Firestore Emulator permission tests, browser E2E, and full Customer/Partner/Admin rules compatibility.
 - **Deployment decision:** **DO NOT DEPLOY FIRESTORE RULES** from this branch. Do not use the Website-only or Partner checked-in rules as a shared production ruleset.
-- **Next required work:** obtain the current deployed-rules export from the authorized project operator; inventory the exact repository tree and actual CI workflow; agree the canonical shared schema; prepare a complete shared rules candidate; then run Emulator positive/negative tests and browser verification before any production change.
+- **Next required work:** obtain the currently deployed rules export from the authorized project operator; agree the canonical shared schema; prepare a complete shared rules candidate; then run Emulator positive/negative tests and browser verification before any production change.
 
-This audit is source-level evidence only. A missing file from a search or a 404 for a guessed path is recorded as an evidence gap, not proof that the file/configuration does not exist. No Firebase Console changes or production deployments were made.
+This is source-level evidence only. A 404 for a guessed path or a missing search result is an evidence gap, not proof that a configuration does not exist. No Firebase Console changes or production deployments were made.
 
 # Firebase Web Readiness Audit
 
@@ -340,4 +341,35 @@ Before changing behavior, confirm the intended post-login destination and whethe
 | App/auth code changed | NO — report-only review |
 
 **Step 66 status:** source behavior finding documented; no Firebase Console changes, rules changes, live OTP tests, or deployments performed.
+
+# Step 67: Exact Customer Auth CI workflow and latest run verification
+
+The integration workflow path has now been obtained from the changed-file list of PR #5 and read directly from branch `feature/website-customer-auth-profile-integration`:
+`.github/workflows/customer-auth-integration-checks.yml` (blob SHA `f4f2532bd99104fc8093b2c0472fcc4f2d9399ff`).
+
+Workflow behavior confirmed from source:
+- Trigger: pull requests whose base branch is `feature/website-customer-profile-firestore`, plus manual `workflow_dispatch`.
+- Job: `Syntax and DOM contract checks` on `ubuntu-latest`, Node.js 22.
+- Checks: external `customer-auth.js` module syntax; extraction and syntax validation of the profile page's inline module; duplicate HTML IDs; local script paths; login-page DOM IDs referenced by the auth module; required account-selector/login IDs; and profile-load safety guard.
+- Explicit scope limit: the workflow itself says Firebase network behavior, SMS OTP, Firestore Rules, and browser E2E are not tested.
+
+#### Latest run checked
+
+GitHub Actions run `39248019883`, “Customer auth integration checks” (run number 13), completed with conclusion `success`. Its job steps show the auth module syntax, profile module extraction/syntax, and HTML/DOM/local-link/load-safety checks all completed successfully.
+
+#### Step 67 result and remaining gate
+
+| Gate | Result |
+|---|---|
+| Exact integration workflow path identified | PASS |
+| Workflow source inspected | PASS |
+| Latest integration static CI run | PASS — run `39248019883` |
+| Firebase Emulator configured/tested | NOT VERIFIED / NOT RUN |
+| Live Phone Auth / SMS OTP | NOT RUN |
+| Browser end-to-end login/profile flow | NOT RUN |
+| Deployed Firestore rules retrieved | NOT VERIFIED |
+| Safe to deploy shared Firestore rules | NO |
+| PR #5 ready to merge based on these checks alone | NO — static checks do not resolve rules/schema or live-flow gaps |
+
+No workflow, auth/profile application code, Firestore rules, Firebase Console settings, PR #5 status, or production environment was changed in Step 67. This step updates audit evidence only.
 
