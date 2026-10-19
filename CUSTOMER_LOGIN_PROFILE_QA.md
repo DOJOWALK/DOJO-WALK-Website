@@ -26,7 +26,7 @@ Date: 2026-10-19
 
 ## Shared-schema compatibility findings
 
-- The existing Flutter customer app writes `users/{uid}.dateOfBirth` as a Firestore `Timestamp` (in `lib/features/profile/screens/name_setup_screen.dart`), while this website writes `dateOfBirth` as a `YYYY-MM-DD` string. The customer app's current parser accepts both Timestamp and String, but the draft website rules only accept String. This is a mixed-type schema and must be standardized deliberately before production.
+- The existing Flutter customer app writes `users/{uid}.dateOfBirth` as a Firestore `Timestamp` (in `lib/features/profile/screens/name_setup_screen.dart`). The website was initially reviewed while it wrote a `YYYY-MM-DD` string; that finding is historical and superseded by Step 17/22, where the current website writer was aligned to Firestore `Timestamp`. The draft website rules also require Timestamp. This is a static source comparison; existing stored documents and every consumer have not been audited live.
 - The existing customer app stores `photoUrl` and reads the shared `users/{uid}` document. The website currently preserves a loaded photo URL but does not upload/change profile photos. Confirm all required fields and types across clients before changing rules.
 - The Partner repository has its own Firestore rules for `walkers/{walkerUid}` and other collections. This website's draft rules are not a complete shared-project ruleset and must not replace the canonical rules used by Customer, Partner, and Admin.
 - Compatibility search is a focused source review, not a complete audit of every repository, collection, Cloud Function, or deployed rule.
@@ -119,3 +119,15 @@ Static source-code checks only. This is not a live integration test, security ce
 - Static schema check: website writes `dateOfBirth` as a Firestore Timestamp and the draft rule expects a Timestamp; profile document path remains `users/{uid}`. This does not replace a full shared-project schema/rules audit.
 - Validation performed: source string/path/config checks and exact regex correction review only. No browser execution, JavaScript runtime test, Firebase Console inspection, live Auth/Firestore request, or Emulator test was run.
 - Security/deployment warning remains: `firestore.rules` is a partial draft that denies all collections except the user's own `users/{uid}`; do not deploy it to the shared project as-is.
+
+
+## Step 23 — Profile save/load and draft-rules consistency review
+
+- Re-fetched the current profile page, draft Firestore rules, and this QA report from `feature/website-customer-profile-firestore`.
+- Checked the profile form's `name`, `gender`, `dob`, `profile-form`, `status`, `save`, `signout`, and `account-line` selectors against the HTML; all selectors referenced by the module are present.
+- Checked load/save handling: signed-out users are redirected to login; profile reads and writes are wrapped in error handling; the save button is disabled during save and restored in `finally`; save uses `setDoc(..., { merge: true })`; existing valid `createdAt` is preserved, while a missing/malformed value is repaired.
+- Checked the rules against the current writer: the create allow-list covers the fields the page writes; update `affectedKeys()` limits changed fields; owner UID and Firebase phone claim are checked; valid existing `createdAt` cannot be changed; deletes are denied. The catch-all deny also means these rules are not a safe complete ruleset for the shared Firebase database.
+- Corrected the earlier shared-schema paragraph so it clearly marks the string-DOB observation as historical and reflects the current Timestamp writer/rules alignment.
+- No additional profile code or rules change was warranted by this static pass. No JavaScript execution, browser test, Firebase Emulator test, live Firestore operation, deployed-rule check, or cross-repository full rules audit was performed.
+
+**Step 23 result:** Static review completed; no merge or deployment. The partial `firestore.rules` file remains a deployment blocker until integrated with and tested against the full shared-project ruleset.
