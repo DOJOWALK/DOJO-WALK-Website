@@ -31,6 +31,24 @@ Date: 2026-10-19
 - The Partner repository has its own Firestore rules for `walkers/{walkerUid}` and other collections. This website's draft rules are not a complete shared-project ruleset and must not replace the canonical rules used by Customer, Partner, and Admin.
 - Compatibility search is a focused source review, not a complete audit of every repository, collection, Cloud Function, or deployed rule.
 
+## Step 16 — Field-by-field comparison with the current Customer app
+
+The current `NameSetupScreen` writes to `users/{uid}` with merge enabled and includes:
+- `uid` (Firebase Auth UID)
+- `name`
+- `gender`
+- `dateOfBirth` as a Firestore `Timestamp`
+- `phoneNumber`
+- `photoUrl`
+- `role: "customer"`
+- `profileCompleted: true`
+- `updatedAt` as a server timestamp
+- `createdAt` as a server timestamp on first creation or when missing
+
+The website currently writes `name`, `gender`, `dateOfBirth` as a string, `age`, `phoneNumber`, `email`, `photoUrl`, and `updatedAt`. This confirms several differences beyond the date type: the website adds `age` and `email`, while it does not currently write the Customer app's `uid`, `role`, `profileCompleted`, or `createdAt` fields. Because the website uses merge writes, it should preserve existing fields on an existing document, but a profile first created by the website may not have the fields the mobile app expects.
+  
+**Step 16 conclusion:** do not change shared schema or deploy rules yet. Before code changes, decide whether the website should create the same minimum profile fields as the Flutter app and standardize `dateOfBirth` to Timestamp across both clients. Also confirm whether `email` and `age` are truly required by other consumers; they are not written in the inspected Customer `NameSetupScreen`. This was source review only, not a live database audit.
+
 ## Not tested — do not claim these work yet
 
 - Real SMS delivery and OTP verification on the deployed GitHub Pages domain.
