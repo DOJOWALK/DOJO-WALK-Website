@@ -163,3 +163,15 @@ Static source-code checks only. This is not a live integration test, security ce
 - No merge or deployment was performed. The partial Firestore rules remain unsafe to deploy to the shared project until the full customer/partner/admin ruleset is integrated and tested.
 
 **Step 26 result:** Auth-state cleanup improvement committed on the feature branch; runtime behavior still requires testing.
+
+## Step 27 — Website navigation and pre-merge status audit
+
+- Inspected the six core HTML pages on the customer-profile feature branch: home, customer login, customer profile, privacy, terms, and cancellation/refunds.
+- Checked local page links and fragment anchors among those inspected pages; no missing page targets or missing in-page anchor IDs were found in this scoped check.
+- Reviewed current PR metadata: PR #2, PR #3, and PR #4 are all open, draft, unmerged, and reported mergeable by GitHub. PR #4 targets PR #3; PR #3 targets PR #2; PR #2 targets main, so the intended merge sequence remains dependency-ordered.
+- No pull-request workflow runs were returned for the latest PR #4 QA commit. This is not proof that no checks exist elsewhere; no successful automated test run was verified in this check.
+- This navigation audit does not establish that binary image assets load, that pages render correctly on Android, or that Firebase OTP/profile operations work.
+- Merge blockers remain: real OTP/reCAPTCHA verification, browser/mobile checks, live or Emulator Firestore profile tests, and a complete shared-project Firestore rules audit. The partial firestore.rules must not be deployed as-is.
+- No PR was merged, marked ready, or deployed.
+
+**Step 27 result:** Scoped navigation review completed. The change set is not yet production-verified and should remain draft until the runtime/security blockers are resolved.
