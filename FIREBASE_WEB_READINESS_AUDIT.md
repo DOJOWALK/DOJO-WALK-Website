@@ -62,3 +62,23 @@ The GitHub Actions run for audit commit `7329b74aef0e0d5ba625416769b4a1b37ba0bd4
 ### Compatibility decision still required
 
 Do not silently remove fields from either client or loosen rules without a shared schema decision. The owner should confirm whether `gender` is optional or required and whether `age` is a stored field or derived from `dateOfBirth`. Then update the canonical shared rules and add emulator tests for both clients' create and update payloads before any deployment.
+
+
+### Step 58: Shared schema inventory and evidence gaps
+
+Read-only searches were run against the default branches of the Customer and Admin repositories for Firestore rules/configuration and profile access patterns. The Customer source confirms multiple flows read `users/{uid}` (profile screen, splash/auth checks, and booking profile validation), while `name_setup_screen.dart` writes the shared profile document. Searches did not return a root `firestore.rules` or `firebase.json` result in the Customer repo, nor a discoverable Firestore rules file in the Admin repo. Search-index absence is an evidence gap only; it does not prove the files or configuration are absent.
+
+#### Provisional compatibility matrix (based only on checked-in source)
+
+| Consumer | Observed profile path / fields | Rules evidence | Current conclusion |
+|---|---|---|---|
+| Website | `users/{uid}`; writes `uid`, `name`, `gender`, Timestamp `dateOfBirth`, `age`, `phoneNumber`, `email`, `photoUrl`, `role`, `profileCompleted`, timestamps | Website branch contains a draft owner-only rules file that denies other collections; not production-safe for the shared project | Payload known; must not deploy draft rules |
+| Flutter Customer | `users/{uid}`; writes `uid`, `name`, `gender`, Timestamp `dateOfBirth`, `phoneNumber`, `photoUrl`, `role`, `profileCompleted`, timestamps | Customer root rules file not located during this search | Payload known; rules compatibility unverified |
+| Partner | Reads/writes `users/{userId}` and other collections per checked-in `firestore.rules` | Checked-in rules allowlists exclude fields used by Website/Customer for profile create/update | Definite source-level mismatch if this rules file is the deployed ruleset; deployment status unknown |
+| Admin | Admin-related paths and collections are represented in Partner's checked-in rules, including `admin_users`, `customers`, bookings, service/zones-related data; Admin repository rules file was not located in this search | No verified complete Admin ruleset in this audit | Need source/rules discovery and deployed rules export before compatibility can be asserted |
+
+#### No deployment decision yet
+
+The complete shared ruleset cannot safely be reconstructed from the partial evidence. In particular, the checked-in Partner rules explicitly deny booking creation and deny all `walk_requests` reads/writes, so treating that file alone as the final shared production ruleset could break customer booking and other flows. Before any rules change, retrieve the currently deployed rules, inventory every collection used by Customer/Partner/Admin, and run Emulator tests for allowed owner access, cross-user denial, profile create/update, pet/address access, booking creation/cancellation, walker operations, admin operations, and service-location management.
+
+**Step 58 status:** source inventory expanded; no app code, Firestore rules, Firebase Console settings, or deployment changed.
