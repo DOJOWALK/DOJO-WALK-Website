@@ -18,14 +18,11 @@ const otpInput = document.getElementById("otp-code");
 const otpRow = document.getElementById("otp-row");
 const authButton = document.getElementById("auth-button");
 const changeNumberButton = document.getElementById("change-number-button");
-const existingButton = document.getElementById("existing-user");
-const newButton = document.getElementById("new-user");
 const accountHint = document.getElementById("account-hint");
 const authStatusTitle = document.getElementById("auth-status-title");
 const authStatusCopy = document.getElementById("auth-status-copy");
 const recaptchaContainer = document.getElementById("recaptcha-container");
 
-let isNewUser = false;
 let confirmationResult = null;
 let recaptchaVerifier = null;
 let busy = false;
@@ -95,8 +92,6 @@ async function sendOtp() {
     await setupRecaptcha();
     confirmationResult = await signInWithPhoneNumber(auth, "+91" + digits, recaptchaVerifier);
     phoneInput.disabled = true;
-    existingButton.disabled = true;
-    newButton.disabled = true;
     changeNumberButton.hidden = false;
     otpRow.hidden = false;
     otpInput.required = true;
@@ -133,7 +128,7 @@ async function verifyOtp() {
     authButton.style.background = "linear-gradient(135deg,#ff9b36,#ff7900)";
     authButton.style.color = "#fff";
     setStatus(
-      isNewUser ? "Phone verified — next: customer profile" : "Phone verified — signed in",
+      "Phone verified — signed in",
       "Your Firebase phone sign-in succeeded (" + phone + "). Customer profile saving, dog details, and bookings are not connected yet; no booking has been created.",
       "success"
     );
@@ -152,8 +147,6 @@ function restartWithDifferentNumber() {
   otpInput.required = false;
   otpRow.hidden = true;
   phoneInput.disabled = false;
-  existingButton.disabled = false;
-  newButton.disabled = false;
   changeNumberButton.hidden = true;
   authButton.textContent = "Send OTP";
   clearRecaptcha();
@@ -187,28 +180,10 @@ authButton.addEventListener("click", async () => {
   else await sendOtp();
 });
 
-function selectAccountType(newUser) {
-  if (confirmationResult || auth.currentUser) return;
-  isNewUser = newUser;
-  existingButton.setAttribute("aria-pressed", String(!newUser));
-  newButton.setAttribute("aria-pressed", String(newUser));
-  accountHint.textContent = newUser
-    ? "Verify your mobile number first. Customer profile creation will be the next setup step."
-    : "Verify your mobile number to sign in. Your pet profile and bookings are not yet connected to this website.";
-  document.getElementById("login-title").textContent = newUser ? "Create customer account" : "Customer login";
-  authButton.textContent = "Send OTP";
-  setStatus("Ready for phone verification", "Firebase Phone Authentication must be enabled and this deployed website domain must be authorized in Firebase.", "info");
-}
-
-existingButton.addEventListener("click", () => selectAccountType(false));
-newButton.addEventListener("click", () => selectAccountType(true));
-
 onAuthStateChanged(auth, user => {
   if (!user) {
     if (!busy) clearRecaptcha();
     phoneInput.disabled = false;
-    existingButton.disabled = false;
-    newButton.disabled = false;
     changeNumberButton.hidden = true;
     changeNumberButton.disabled = false;
     otpRow.hidden = true;
@@ -225,8 +200,6 @@ onAuthStateChanged(auth, user => {
     return;
   }
   phoneInput.disabled = true;
-  existingButton.disabled = true;
-  newButton.disabled = true;
   changeNumberButton.hidden = true;
   changeNumberButton.disabled = false;
   otpRow.hidden = true;
