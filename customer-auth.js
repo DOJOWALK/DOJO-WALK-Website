@@ -17,14 +17,15 @@ const phoneInput = document.getElementById("phone");
 const otpInput = document.getElementById("otp-code");
 const otpRow = document.getElementById("otp-row");
 const authButton = document.getElementById("auth-button");
-const existingButton = document.getElementById("existing-user");
-const newButton = document.getElementById("new-user");
-const accountHint = document.getElementById("account-hint");
+const changeNumberButton = document.getElementById("change-number-button");
 const authStatusTitle = document.getElementById("auth-status-title");
 const authStatusCopy = document.getElementById("auth-status-copy");
 const recaptchaContainer = document.getElementById("recaptcha-container");
-
+const existingButton = document.getElementById("existing-user");
+const newButton = document.getElementById("new-user");
+const accountHint = document.getElementById("account-hint");
 let isNewUser = false;
+
 let confirmationResult = null;
 let recaptchaVerifier = null;
 let busy = false;
@@ -41,6 +42,7 @@ function setStatus(title, copy, kind = "info") {
 function setBusy(value) {
   busy = value;
   authButton.disabled = value;
+  changeNumberButton.disabled = value || Boolean(auth.currentUser);
   authButton.style.cursor = value ? "wait" : "pointer";
   authButton.style.background = value ? "#e8e1da" : "linear-gradient(135deg,#ff9b36,#ff7900)";
   authButton.style.color = value ? "#81766d" : "#fff";
@@ -92,6 +94,8 @@ async function sendOtp() {
   try {
     await setupRecaptcha();
     confirmationResult = await signInWithPhoneNumber(auth, "+91" + digits, recaptchaVerifier);
+    phoneInput.disabled = true;
+    changeNumberButton.hidden = false;
     otpRow.hidden = false;
     otpInput.required = true;
     otpInput.focus();
@@ -119,6 +123,7 @@ async function verifyOtp() {
     const phone = credential.user.phoneNumber || "your verified mobile number";
     otpRow.hidden = true;
     otpInput.required = false;
+    changeNumberButton.hidden = true;
     phoneInput.disabled = true;
     authButton.textContent = "Sign out";
     authButton.disabled = false;
@@ -138,24 +143,25 @@ async function verifyOtp() {
   }
 }
 
-form.addEventListener("submit", event => event.preventDefault());
-authButton.addEventListener("click", async () => {
-  if (busy) return;
-  if (auth.currentUser) {
-    setBusy(true);
-    try {
-      await signOut(auth);
-      setStatus("Signed out", "You have safely signed out of DOJO WALK.", "success");
-    } catch (error) {
-      setStatus("Could not sign out", friendlyError(error), "error");
-    } finally {
-      setBusy(false);
-    }
-    return;
-  }
-  if (confirmationResult) await verifyOtp();
-  else await sendOtp();
-});
+function restartWithDifferentNumber() {
+  if (busy || auth.currentUser || !confirmationResult) return;
+  confirmationResult = null;
+  otpInput.value = "";
+  otpInput.required = false;
+  otpRow.hidden = true;
+  phoneInput.disabled = false;
+  changeNumberButton.hidden = true;
+  authButton.textContent = "Send OTP";
+  clearRecaptcha();
+  setStatus(
+    "Change mobile number",
+    "Enter the correct 10-digit number, then request a new OTP. The previous verification attempt has been reset.",
+    "info"
+  );
+  phoneInput.focus();
+}
+
+changeNumberButton.addEventListener("click", restartWithDifferentNumber);
 
 function selectAccountType(newUser) {
   if (confirmationResult || auth.currentUser) return;
@@ -169,15 +175,38 @@ function selectAccountType(newUser) {
   authButton.textContent = "Send OTP";
   setStatus("Ready for phone verification", "Firebase Phone Authentication must be enabled and this deployed website domain must be authorized in Firebase.", "info");
 }
-
 existingButton.addEventListener("click", () => selectAccountType(false));
 newButton.addEventListener("click", () => selectAccountType(true));
 
+
+form.addEventListener("submit", event => event.preventDefault());
+authButton.addEventListener("click", async () => {
+  if (busy) return;
+  if (auth.currentUser) {
+    setBusy(true);
+    try {
+      await signOut(auth);
+      clearRecaptcha();
+      setStatus("Signed out", "You have safely signed out of DOJO WALK.", "success");
+    } catch (error) {
+      setStatus("Could not sign out", friendlyError(error), "error");
+    } finally {
+      setBusy(false);
+    }
+    return;
+  }
+  if (confirmationResult) await verifyOtp();
+  else await sendOtp();
+});
+
 onAuthStateChanged(auth, user => {
   if (!user) {
+    if (!busy) clearRecaptcha();
     phoneInput.disabled = false;
     existingButton.disabled = false;
     newButton.disabled = false;
+    changeNumberButton.hidden = true;
+    changeNumberButton.disabled = false;
     otpRow.hidden = true;
     otpInput.required = false;
     otpInput.value = "";
@@ -194,12 +223,14 @@ onAuthStateChanged(auth, user => {
   phoneInput.disabled = true;
   existingButton.disabled = true;
   newButton.disabled = true;
+  changeNumberButton.hidden = true;
+  changeNumberButton.disabled = false;
   otpRow.hidden = true;
   authButton.textContent = "Sign out";
   authButton.disabled = false;
   authButton.style.cursor = "pointer";
   authButton.style.background = "linear-gradient(135deg,#ff9b36,#ff7900)";
   authButton.style.color = "#fff";
-  setStatus("Signed in to Firebase", "Phone authentication is active for this session. Continue to your customer profile to save your personal details; dog details and bookings are not connected yet.", "success");
+  setStatus("Signed in to Firebase", "Phone authentication is active. Continue to your customer profile to view or save your personal details. Dog details and bookings are not connected yet.", "success");
   document.getElementById("profile-next-step").hidden = false;
 });
