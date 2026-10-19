@@ -49,6 +49,15 @@ The website currently writes `name`, `gender`, `dateOfBirth` as a string, `age`,
   
 **Step 16 conclusion:** do not change shared schema or deploy rules yet. Before code changes, decide whether the website should create the same minimum profile fields as the Flutter app and standardize `dateOfBirth` to Timestamp across both clients. Also confirm whether `email` and `age` are truly required by other consumers; they are not written in the inspected Customer `NameSetupScreen`. This was source review only, not a live database audit.
 
+## Step 17 — Website profile schema alignment (static review)
+
+- Website profile writes now include `uid`, `role: "customer"`, and `profileCompleted: true`, matching the fields written by the inspected Flutter Customer `NameSetupScreen`.
+- Website writes `dateOfBirth` as a Firestore `Timestamp`, matching the Flutter Customer app's create/update flow.
+- Website checks the existing user document and only sets `createdAt` when the document is new or that field is missing; writes continue to use merge mode.
+- Draft rules were updated to expect the aligned fields, Timestamp dateOfBirth, owner UID, customer role, completed profile, and server timestamp fields.
+- Static source checks only. These rules are still a draft: they deny every other collection, have not been emulator-tested, and must not be deployed to the shared Firebase project without full ruleset integration/review.
+- The `age` field remains client-calculated; these rules only validate its type/range and do not prove it matches dateOfBirth. Do not use it as trusted age verification.
+
 ## Not tested — do not claim these work yet
 
 - Real SMS delivery and OTP verification on the deployed GitHub Pages domain.
