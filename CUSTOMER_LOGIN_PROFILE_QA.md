@@ -195,3 +195,15 @@ Static source-code checks only. This is not a live integration test, security ce
 - Runtime blockers remain: actual SMS/reCAPTCHA, browser/Android testing, Firestore Emulator/live profile checks, and full shared-project rules audit. The partial Firestore rules must not be deployed as-is.
 
 **Step 29 result:** A branch-sync blocker was found. Do not merge PR #4 until its base-branch divergence is resolved and mergeability is re-checked.
+
+
+## Step 30 — Inspect overlapping base-branch changes
+
+- Rechecked the current PR #3 and PR #4 metadata and compared PR #4's head with its intended base. PR #4 is still open/draft/unmerged and GitHub reports `mergeable: false`; the feature branch is 39 commits ahead and 3 commits behind the base.
+- Inspected the current `customer-auth.js` and `customer-login.html` versions on both branches. The base branch's latest visible change updates the signed-in status copy and reveals the profile next-step link; PR #4's branch additionally contains the phone-number restart flow, reCAPTCHA cleanup, and removal of the misleading Existing/New selector.
+- The two branches edit the same auth/login files, so blindly copying the base versions would discard PR #4 work. No safe branch synchronization was performed in this step because the available connector path did not provide a verified merge/conflict-resolution workflow or tree metadata to create a normal merge commit safely.
+- Next safe action is to inspect all three commits unique to the base and resolve the overlapping files while preserving both sets of intended behavior, then re-run static checks and re-check PR mergeability.
+- No branch history was rewritten, no force-push was made, no PR was merged, and no deployment was performed.
+- Runtime/security blockers are unchanged: no real SMS/reCAPTCHA, browser/Android end-to-end, Firestore Emulator/live profile test, or full shared-project Firestore rules audit has been verified. Do not deploy the partial Firestore rules.
+
+**Step 30 result:** The overlapping behavior is identified; PR #4 remains blocked pending a safe branch sync and runtime/security validation.
