@@ -17,6 +17,7 @@ const phoneInput = document.getElementById("phone");
 const otpInput = document.getElementById("otp-code");
 const otpRow = document.getElementById("otp-row");
 const authButton = document.getElementById("auth-button");
+const changeNumberButton = document.getElementById("change-number-button");
 const existingButton = document.getElementById("existing-user");
 const newButton = document.getElementById("new-user");
 const accountHint = document.getElementById("account-hint");
@@ -41,6 +42,7 @@ function setStatus(title, copy, kind = "info") {
 function setBusy(value) {
   busy = value;
   authButton.disabled = value;
+  changeNumberButton.disabled = value || Boolean(auth.currentUser);
   authButton.style.cursor = value ? "wait" : "pointer";
   authButton.style.background = value ? "#e8e1da" : "linear-gradient(135deg,#ff9b36,#ff7900)";
   authButton.style.color = value ? "#81766d" : "#fff";
@@ -92,6 +94,10 @@ async function sendOtp() {
   try {
     await setupRecaptcha();
     confirmationResult = await signInWithPhoneNumber(auth, "+91" + digits, recaptchaVerifier);
+    phoneInput.disabled = true;
+    existingButton.disabled = true;
+    newButton.disabled = true;
+    changeNumberButton.hidden = false;
     otpRow.hidden = false;
     otpInput.required = true;
     otpInput.focus();
@@ -119,6 +125,7 @@ async function verifyOtp() {
     const phone = credential.user.phoneNumber || "your verified mobile number";
     otpRow.hidden = true;
     otpInput.required = false;
+    changeNumberButton.hidden = true;
     phoneInput.disabled = true;
     authButton.textContent = "Sign out";
     authButton.disabled = false;
@@ -137,6 +144,28 @@ async function verifyOtp() {
     setBusy(false);
   }
 }
+
+function restartWithDifferentNumber() {
+  if (busy || auth.currentUser || !confirmationResult) return;
+  confirmationResult = null;
+  otpInput.value = "";
+  otpInput.required = false;
+  otpRow.hidden = true;
+  phoneInput.disabled = false;
+  existingButton.disabled = false;
+  newButton.disabled = false;
+  changeNumberButton.hidden = true;
+  authButton.textContent = "Send OTP";
+  clearRecaptcha();
+  setStatus(
+    "Change mobile number",
+    "Enter the correct 10-digit number, then request a new OTP. The previous verification attempt has been reset.",
+    "info"
+  );
+  phoneInput.focus();
+}
+
+changeNumberButton.addEventListener("click", restartWithDifferentNumber);
 
 form.addEventListener("submit", event => event.preventDefault());
 authButton.addEventListener("click", async () => {
@@ -178,6 +207,8 @@ onAuthStateChanged(auth, user => {
     phoneInput.disabled = false;
     existingButton.disabled = false;
     newButton.disabled = false;
+    changeNumberButton.hidden = true;
+    changeNumberButton.disabled = false;
     otpRow.hidden = true;
     otpInput.required = false;
     otpInput.value = "";
@@ -194,6 +225,8 @@ onAuthStateChanged(auth, user => {
   phoneInput.disabled = true;
   existingButton.disabled = true;
   newButton.disabled = true;
+  changeNumberButton.hidden = true;
+  changeNumberButton.disabled = false;
   otpRow.hidden = true;
   authButton.textContent = "Sign out";
   authButton.disabled = false;
