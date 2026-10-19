@@ -174,7 +174,23 @@ existingButton.addEventListener("click", () => selectAccountType(false));
 newButton.addEventListener("click", () => selectAccountType(true));
 
 onAuthStateChanged(auth, user => {
-  if (!user) return;
+  if (!user) {
+    phoneInput.disabled = false;
+    existingButton.disabled = false;
+    newButton.disabled = false;
+    otpRow.hidden = true;
+    otpInput.required = false;
+    otpInput.value = "";
+    phoneInput.value = "";
+    confirmationResult = null;
+    authButton.textContent = "Send OTP";
+    authButton.disabled = false;
+    authButton.style.cursor = "pointer";
+    authButton.style.background = "linear-gradient(135deg,#ff9b36,#ff7900)";
+    authButton.style.color = "#fff";
+    document.getElementById("profile-next-step").hidden = true;
+    return;
+  }
   phoneInput.disabled = true;
   existingButton.disabled = true;
   newButton.disabled = true;
