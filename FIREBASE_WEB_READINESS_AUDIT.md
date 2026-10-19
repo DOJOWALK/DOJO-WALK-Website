@@ -1,18 +1,18 @@
 ## Executive Summary — Current Status (2026-10-19)
 
-**Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** Source-level review and static CI checks have passed, but this is not a complete live Firebase validation and the shared Firestore rules must not be deployed.
+**Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** Source-level review and static CI checks have passed, but live Firebase behavior and shared Firestore authorization remain unverified.
 
 - **Target Firebase project:** `dojo-platform-b68a3`.
-- **Latest audit step:** Step 67 (auth integration CI workflow and account-selector behavior verified).
-- **Static CI evidence:** Customer Auth integration run `39248019883` completed successfully. It checks JS syntax, extracted profile-module syntax, HTML/local links/DOM selectors and the profile-load guard. It does not test Firebase authorization, real SMS OTP, or browser end-to-end behavior.
-- **Workflow path now identified:** `.github/workflows/customer-auth-integration-checks.yml` on the integration branch; it runs for pull requests targeting `feature/website-customer-profile-firestore` and supports manual dispatch.
-- **Known source-level risks:** Website draft rules only allow owner-scoped `users/{uid}` access and deny other collections; checked-in Partner rules have profile-field allowlist mismatches and explicitly deny booking creation. Neither checked-in file is verified as the rules currently deployed to Firebase.
+- **Latest report update:** Step 71. The report-only PR #6 is merged into `main`; report content has been verified on `main`.
+- **Customer login/profile integration PR #5:** merged successfully into `feature/website-customer-profile-firestore` (merge commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`). It is **not merged into `main`**.
+- **Remaining draft PR chain:** PR #2 targets `main`; PR #3 targets the home-polish branch; PR #4 targets the customer-login branch. All three are still open drafts and must be reviewed in dependency order before promotion.
+- **Static CI evidence:** run `39248019883` for the auth integration passed syntax, DOM/local-link and profile-load guard checks. This is not Firebase Emulator, live OTP, or browser end-to-end validation.
+- **Known source-level risks:** Website draft rules only allow owner-scoped `users/{uid}` access and deny other collections; checked-in Partner rules have profile-field allowlist mismatches and explicitly deny booking creation. Neither file is verified as the rules currently deployed to Firebase.
 - **Not verified:** deployed Firestore rules, Firebase Console Phone Auth/authorized domains, live SMS OTP, Firestore Emulator permission tests, browser E2E, and full Customer/Partner/Admin rules compatibility.
-- **Deployment decision:** **DO NOT DEPLOY FIRESTORE RULES** from this branch. Do not use the Website-only or Partner checked-in rules as a shared production ruleset.
-- **Next required work:** obtain the currently deployed rules export from the authorized project operator; agree the canonical shared schema; prepare a complete shared rules candidate; then run Emulator positive/negative tests and browser verification before any production change.
+- **Deployment decision:** **DO NOT DEPLOY FIRESTORE RULES** from this branch. Do not use Website-only or Partner checked-in rules as a shared production ruleset.
+- **Next required work:** review the remaining PR chain and code diffs; obtain the currently deployed rules export from the authorized project operator; agree the canonical shared schema; prepare a complete shared rules candidate; then run positive/negative Emulator tests and browser verification before any production change.
 
-This is source-level evidence only. A 404 for a guessed path or a missing search result is an evidence gap, not proof that a configuration does not exist. No Firebase Console changes or production deployments were made.
-
+Missing paths or unsuccessful searches are evidence gaps, not proof that a file/configuration does not exist. No Firebase Console settings or production deployments were changed.
 # Firebase Web Readiness Audit
 
 **Audit scope:** `feature/website-customer-auth-profile-integration`  
@@ -466,4 +466,29 @@ On 2026-10-19, customer login/profile integration PR #5 was promoted from Draft 
 This merge advances the code integration but does not certify production readiness. Do not deploy Firestore rules from this branch. The known draft rules/schema compatibility findings from Step 69 remain unresolved until currently deployed rules are authoritatively inspected, the shared schema is agreed, and positive/negative Emulator tests pass.
 
 No Firebase Console settings or production data were changed in Step 70.
+
+
+
+# Step 71: Main-branch report and integration promotion status reconciliation
+
+Re-checked GitHub PR metadata and fetched the audit report from `main`.
+
+- PR #6 (report-only update) is merged into `main`; merge commit `e4b11ca74a3f4c6464078c8c06beef2506c65c44`.
+- PR #5 (customer auth/profile integration) is merged into `feature/website-customer-profile-firestore`, merge commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`. Its base branch is a feature branch, so this does not mean the integration code is on `main`.
+- PR #2, #3 and #4 remain open drafts, with dependency chain: #2 `feature/website-home-screen-market-polish` → `main`; #3 `feature/website-customer-login-structure` → home-polish branch; #4 `feature/website-customer-profile-firestore` → customer-login branch. They require ordered review; no merge was performed in this step.
+- The known successful auth integration static CI run is `39248019883`; its coverage does not establish live Firebase, Emulator, or browser E2E success.
+
+| Gate | Result |
+|---|---|
+| Audit report present on `main` | PASS |
+| PR #6 report merge verified | PASS |
+| PR #5 integration merge verified | PASS — feature branch only |
+| PRs #2–#4 status verified | PASS — still draft/open |
+| Customer integration on `main` | NO |
+| Shared Firestore schema/rules approved | NO |
+| Emulator security tests | NOT RUN |
+| Live OTP/browser E2E | NOT VERIFIED |
+| Production rules deployment | NO |
+
+No application source, Firestore rules, Firebase Console configuration, or PR merge state was changed in Step 71; this step reconciles the audit summary with verified GitHub metadata.
 
