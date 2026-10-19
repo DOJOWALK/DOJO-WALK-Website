@@ -37,10 +37,17 @@ service cloud.firestore {
 
       // Preserve any existing shared-schema fields that this website does not change.
       function validProfileUpdate() {
+        // Once createdAt is a valid Timestamp, the customer cannot rewrite it.
+        // A missing or malformed legacy value may be repaired to a Timestamp.
         return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'uid', 'name', 'gender', 'dateOfBirth', 'age', 'phoneNumber',
           'email', 'photoUrl', 'role', 'profileCompleted', 'createdAt', 'updatedAt'
-        ]) && validProfileFields();
+        ])
+          && (
+            !(resource.data.createdAt is timestamp)
+            || request.resource.data.createdAt == resource.data.createdAt
+          )
+          && validProfileFields();
       }
 
       allow read: if isOwner();
