@@ -3,7 +3,7 @@
 **Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** Source-level review and static CI checks have passed, but live Firebase behavior and shared Firestore authorization remain unverified.
 
 - **Target Firebase project:** `dojo-platform-b68a3`.
-- **Latest report update:** Step 71. The report-only PR #6 is merged into `main`; report content has been verified on `main`.
+- **Latest report update:** Step 72. Current PR chain and CI evidence were reconciled; report changes are awaiting PR review/merge. The report-only PR #6 is merged into `main`; report content has been verified on `main`.
 - **Customer login/profile integration PR #5:** merged successfully into `feature/website-customer-profile-firestore` (merge commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`). It is **not merged into `main`**.
 - **Remaining draft PR chain:** PR #2 targets `main`; PR #3 targets the home-polish branch; PR #4 targets the customer-login branch. All three are still open drafts and must be reviewed in dependency order before promotion.
 - **Static CI evidence:** run `39248019883` for the auth integration passed syntax, DOM/local-link and profile-load guard checks. This is not Firebase Emulator, live OTP, or browser end-to-end validation.
