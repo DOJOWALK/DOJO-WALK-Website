@@ -50,9 +50,18 @@ function status(message, kind = "info") {
   statusBox.textContent = message;
   statusBox.dataset.kind = kind;
 }
-function ageOn(dateString) {
+function isValidDateOfBirth(dateString) {
+  // Require a real calendar date in YYYY-MM-DD format, not a normalized invalid date.
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateString)) return false;
   const dob = new Date(dateString + "T00:00:00Z");
-  if (!dateString || Number.isNaN(dob.getTime())) return -1;
+  return !Number.isNaN(dob.getTime()) &&
+    dob.toISOString().slice(0, 10) === dateString &&
+    dob.getTime() <= Date.now();
+}
+
+function ageOn(dateString) {
+  if (!isValidDateOfBirth(dateString)) return -1;
+  const dob = new Date(dateString + "T00:00:00Z");
   const today = new Date();
   let age = today.getUTCFullYear() - dob.getUTCFullYear();
   const beforeBirthday = today.getUTCMonth() < dob.getUTCMonth() ||
@@ -101,6 +110,10 @@ form.addEventListener("submit", async event => {
   const name = document.getElementById("name").value.trim();
   const gender = document.getElementById("gender").value;
   const dateOfBirth = document.getElementById("dob").value;
+  if (!isValidDateOfBirth(dateOfBirth)) {
+    status("Enter a valid date of birth that is not in the future.", "error");
+    return;
+  }
   const age = ageOn(dateOfBirth);
   if (name.length < 2 || name.length > 100) {
     status("Enter a name between 2 and 100 characters.", "error");
