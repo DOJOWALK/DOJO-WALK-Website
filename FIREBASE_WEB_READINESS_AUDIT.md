@@ -47,3 +47,18 @@ The customer repository's root `firestore.rules` and `firebase.json` were not fo
 - Prefer a backward-compatible change set: preserve existing profile fields and role protections, define optional/required fields explicitly, and ensure only the owner can update private profile fields.
 - Add emulator tests for website profile create/update against the **complete shared ruleset**, plus existing partner and admin flows.
 - Do not deploy either the website draft rules or the partner repository rules based on this repository comparison alone.
+
+
+### Follow-up: customer app payload and CI verification
+
+A source-level comparison was also performed against `dojoplatform2026/dojo-walk-customer/lib/features/profile/screens/name_setup_screen.dart` (default branch, blob SHA `30601d4c884e2a30ffc7a7bcd4a1e09d330c3bfa`).
+
+The customer app's profile save payload contains `uid`, `name`, `gender`, `dateOfBirth` (Firestore Timestamp), `phoneNumber`, `photoUrl`, `role`, `profileCompleted`, `updatedAt`, and conditionally `createdAt`. It does not write `age` or `email` in this save path. The website payload writes `uid`, `name`, `gender` (may be empty), `dateOfBirth` (Timestamp), `age`, `phoneNumber`, `email`, `photoUrl`, `role`, `profileCompleted`, `updatedAt`, and conditionally `createdAt`.
+
+Consequently, the website and Flutter customer app broadly overlap on the core profile fields, but the website adds `age` and `email`, and the website UI treats gender as optional while the Flutter screen requires it. Both write `uid` and `profileCompleted`, which are excluded by the inspected partner rules' `users/{userId}` create allowlist. The inspected partner rules' update allowlist also excludes `gender`, `phoneNumber`, `uid`, and `profileCompleted`. If those checked-in rules are deployed, they can reject profile create/update operations from either customer client.
+
+The GitHub Actions run for audit commit `7329b74aef0e0d5ba625416769b4a1b37ba0bd41` completed successfully (run ID `39241323276`). Its job, “Syntax and DOM contract checks,” passed JavaScript syntax validation, profile module syntax checks, HTML/local-link/DOM selector validation, and profile-load safety checks. This is a static CI pass only; it is not a Firebase Emulator, live SMS, or browser end-to-end test.
+
+### Compatibility decision still required
+
+Do not silently remove fields from either client or loosen rules without a shared schema decision. The owner should confirm whether `gender` is optional or required and whether `age` is a stored field or derived from `dateOfBirth`. Then update the canonical shared rules and add emulator tests for both clients' create and update payloads before any deployment.
