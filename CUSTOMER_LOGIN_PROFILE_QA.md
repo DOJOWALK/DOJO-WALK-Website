@@ -242,3 +242,14 @@ Static source-code checks only. This is not a live integration test, security ce
 - No live browser, SMS/reCAPTCHA, Firebase Emulator, Firestore read/write, or Android end-to-end test was run. No PR was merged and no deployment or rules deployment occurred.
 
 **Step 33 result:** Misleading login status copy fixed and statically rechecked. Branch sync and runtime/security validation remain launch blockers.
+
+
+## Step 34 — Cross-file Firebase configuration and security consistency audit
+
+- Compared `firebase.json`, `firestore.rules`, `customer-profile.html`, `customer-auth.js`, and the deployment checklist on the PR #4 feature branch.
+- Static checks confirmed the Firebase CLI configuration points to `firestore.rules`; profile reads/writes are scoped in code to `users/{currentUser.uid}`; rules include an owner UID check and match the stored phone number to the Firebase Auth phone claim; the catch-all rule denies other collections; the profile code checks ages 18–120 and stores DOB as a Firestore Timestamp; and the OTP restart handler remains present.
+- The same review confirms the security boundary is not production-ready: catch-all denial can break other clients sharing this database, and rules do not independently derive age from DOB. The deployment checklist correctly says rules have not been emulator-tested or deployed.
+- No changes were made to Firebase rules or deployed configuration in this step because a safe shared-project ruleset and emulator test results are not available.
+- PR #4 remains open/draft and branch synchronization with PR #3 remains unresolved. No merge, deployment, or live Firebase test was performed.
+
+**Step 34 result:** Cross-file static consistency checks completed; no production security approval granted.
