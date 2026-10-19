@@ -131,3 +131,14 @@ Static source-code checks only. This is not a live integration test, security ce
 - No additional profile code or rules change was warranted by this static pass. No JavaScript execution, browser test, Firebase Emulator test, live Firestore operation, deployed-rule check, or cross-repository full rules audit was performed.
 
 **Step 23 result:** Static review completed; no merge or deployment. The partial `firestore.rules` file remains a deployment blocker until integrated with and tested against the full shared-project ruleset.
+
+
+## Step 24 — Login edge-case review
+
+- Re-fetched and inspected the login HTML and JavaScript, profile page, and shared Firebase config module on this feature branch.
+- The login page contains the selectors used by its JavaScript module. OTP request, confirmation, busy-state handling, reCAPTCHA cleanup, sign-out, and persisted-auth-state logic were reviewed statically only.
+- **Issue recorded for a focused follow-up:** after an OTP is requested, the phone input remains editable while the pending confirmation result belongs to the originally requested number. Editing the visible number can therefore confuse which number the OTP is verifying. Add a change-number/restart flow or lock the field with an explicit reset action before production.
+- The Existing user/New user toggle changes labels and copy; it does not itself determine whether the Firebase account already exists.
+- No code/rules change, merge, or deployment was made. No browser runtime, real SMS, Firebase Emulator, live Auth/Firestore, or Android test was run.
+
+**Step 24 result:** Static edge-case review completed. One login state/UX issue is documented for the next step. The partial Firestore rules must not be deployed to the shared project as-is.
