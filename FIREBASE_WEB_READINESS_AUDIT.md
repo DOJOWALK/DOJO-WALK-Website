@@ -82,3 +82,28 @@ Read-only searches were run against the default branches of the Customer and Adm
 The complete shared ruleset cannot safely be reconstructed from the partial evidence. In particular, the checked-in Partner rules explicitly deny booking creation and deny all `walk_requests` reads/writes, so treating that file alone as the final shared production ruleset could break customer booking and other flows. Before any rules change, retrieve the currently deployed rules, inventory every collection used by Customer/Partner/Admin, and run Emulator tests for allowed owner access, cross-user denial, profile create/update, pet/address access, booking creation/cancellation, walker operations, admin operations, and service-location management.
 
 **Step 58 status:** source inventory expanded; no app code, Firestore rules, Firebase Console settings, or deployment changed.
+
+
+### Step 59: Customer collections and booking-rule compatibility
+
+Additional read-only source checks:
+- Customer dog screen uses `users/{uid}/pets`.
+- Customer address service uses `users/{uid}/addresses`; it creates/merges address documents and may batch-update multiple documents when changing the default address. The checked-in Partner rules use an address allowlist with `pincode`; confirm the model's serialized field names against it.
+- Customer booking confirmation (blob `94d45b12c7873fc2d289e164df965c735c0c63cb`) writes a top-level `bookings/{bookingId}` document with `customerId`, `bookingId`, `bookingPlan`, `serviceType`, `dogId`, `petDetails`, `pickupAddressId`, `pickupAddress`, `scheduledAt`, `walkCount`, `walkSchedules`, `status: pending`, `walkerId: null`, `cancelRequest: null`, and a server `createdAt` timestamp; regular/custom bookings add schedule fields.
+- Checked-in Partner rules blob `7b02a8bfb4fe80ab04d72f59966e2e09c848ffd0` explicitly says `allow create: if false` for `bookings`. If deployed, this rejects the Customer booking writer. Deployment status remains unknown.
+- Partner rules deny all `walk_requests` access; production use is not established.
+- Admin code searches for service-location collections and booking references returned no indexed results in this pass. This is an evidence gap, not proof those collections/files are absent.
+
+| Path | Evidence / compatibility status |
+|---|---|
+| `users/{uid}` | Website/Flutter payload mismatch risk remains: Partner allowlists omit `uid`, `gender`, and `profileCompleted`. |
+| `users/{uid}/pets/{petId}` | Owner-scoped CRUD exists in checked-in Partner rules; validate actual pet payload and timestamps in Emulator. |
+| `users/{uid}/addresses/{addressId}` | Owner-scoped CRUD exists; verify `pincode` versus serialized field naming and batch default-address updates. |
+| `bookings/{bookingId}` | Critical mismatch if Partner rules are deployed: Customer creates bookings, checked-in rules deny all creates. |
+| `walkers`, nested walker collections, `admin_users`, `customers`, `coupons`, `payments`, `walker_reviews`, `zones`, `audit_logs` | Partner rules have distinct permissions; full Admin and cross-app operation matrix remains incomplete. |
+| `service_countries`, `service_states`, `service_cities`, `service_areas`, `service_localities`, indexes/imports | Rules and actual usage not verified in this pass. |
+
+#### Step 59 conclusion
+Do not deploy either repository's checked-in rules based on this audit. First export the currently deployed rules for the confirmed Firebase project `dojo-platform-b68a3`; reconcile profile, pet, address, booking, walker, admin and service-location operations; then test owner access, cross-user denial, profile CRUD, pet/address CRUD and batch updates, booking creation/cancellation, assigned-walker updates, and admin operations in the Firestore Emulator.
+
+**Step 59 status:** collection inventory expanded; booking-create incompatibility identified from source. No app code, rules, Firebase Console settings, merges, or deployments changed.
