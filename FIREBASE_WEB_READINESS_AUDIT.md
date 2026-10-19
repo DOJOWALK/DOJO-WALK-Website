@@ -187,3 +187,32 @@ Tests must run against a separately reviewed, complete shared rules candidate in
 - Deployment authorization gate: **BLOCKED**
 
 No rules, Firebase Console settings, app payloads, branches other than this audit branch, merges, or deployments were changed in this step.
+
+
+### Step 62: Test-harness and CI setup inspection
+
+Inspected known paths directly on `feature/website-customer-auth-profile-integration` and verified the existing Firebase configuration and browser auth module.
+
+#### Findings
+
+- `firebase.json` currently contains only the Firestore rules path; it has no `emulators.firestore` settings and no test-specific configuration.
+- The expected root `package.json`, `package-lock.json`, and several guessed workflow paths (`.github/workflows/ci.yml`, `.github/workflows/website-checks.yml`, `.github/workflows/validate.yml`) returned 404 on this branch. This does not establish that no workflow exists under another filename or directory.
+- `customer-auth.js` imports Firebase Web SDK modules from the pinned CDN version `11.10.0` and initializes Auth from `firebase-config.js`. This is browser ESM source, not a Node test harness.
+- `firebase-config.js` identifies `dojo-platform-b68a3`; this is public web-client configuration, not evidence of current deployed rules or Console settings.
+- The website-only draft `firestore.rules` remains unsuitable for the shared test suite because it denies every collection except `users/{uid}`.
+
+#### Step 62 decision
+
+Do **not** append Emulator settings to the existing `firebase.json` or add a guessed Node dependency file yet. The repository tree/workflow inventory is incomplete, and a safe test requires a separately reviewed shared rules fixture—not the current website-only rules. First obtain a complete file-tree listing for this branch and inspect the actual CI workflow; then choose a non-conflicting test location and package manager. Keep production and live Firebase untouched.
+
+| Gate | Result |
+|---|---|
+| Existing Firebase CLI config inspected | PASS |
+| Root Node package/test harness verified | NOT FOUND at checked paths |
+| CI workflow identified by exact path | NOT VERIFIED |
+| Firestore Emulator configured | NO |
+| Shared rules fixture approved | NO |
+| Emulator tests executed | NOT RUN |
+| Production changes made | NO |
+
+No application code, Firestore rules, Firebase Console settings, merges, or deployments were changed in Step 62.
