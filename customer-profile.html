@@ -91,7 +91,7 @@ function dateOfBirthInputValue(value) {
 
 onAuthStateChanged(auth, async user => {
   currentUser = user;
-  saveButton.disabled = !user;
+  saveButton.disabled = true;
   signoutButton.hidden = !user;
   if (!user) {
     accountLine.textContent = "You are not signed in.";
@@ -114,12 +114,15 @@ onAuthStateChanged(auth, async user => {
       savedPhotoUrl = data.photoUrl || "";
       status("Your saved profile was loaded.", "success");
       saveButton.textContent = "Update profile";
+      saveButton.disabled = false;
     } else {
       status("Welcome! Complete the form to create your customer profile.");
+      saveButton.disabled = false;
     }
   } catch (error) {
     console.error("Profile load failed", error);
-    status("Could not load your profile. Check your connection and Firestore rules, then retry.", "error");
+    status("Could not load your profile. Saving is disabled to protect existing data. Refresh the page after checking your connection and Firestore rules.", "error");
+    saveButton.disabled = true;
   }
 });
 
@@ -183,7 +186,8 @@ form.addEventListener("submit", async event => {
     console.error("Profile save failed", error);
     status("Profile was not saved. Check Firestore is enabled and rules allow the signed-in user to update only their own users/{uid} document.", "error");
   } finally {
-    saveButton.disabled = !currentUser;
+    // Keep Save disabled after a failed initial profile load.
+    if (currentUser) saveButton.disabled = false;
   }
 });
 
