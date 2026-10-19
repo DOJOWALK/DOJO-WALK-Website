@@ -74,6 +74,14 @@ The website currently writes `name`, `gender`, `dateOfBirth` as a string, `age`,
 - These are defensive static-code changes only. No live Firebase Auth claim inspection or Firestore Emulator test was performed.
 - Security reminder: this draft rules file denies all collections other than `users/{uid}`; do not deploy it to the shared Firebase project as-is.
 
+## Step 20 — DOB/age validation and createdAt rule review
+
+- Confirmed the website validates DOB as a real `YYYY-MM-DD` date, rejects future dates, and computes age on the client before allowing profile save.
+- Confirmed the draft rules require a Timestamp DOB and integer age in the 18–120 range. The rules do **not** independently prove that age matches DOB, so a modified client could submit an inconsistent age; this remains a security limitation.
+- Tightened draft update rules so a valid existing `createdAt` Timestamp must remain unchanged. Missing or malformed legacy values can still be repaired to a Timestamp, subject to the rest of the profile validation.
+- The rules still deny all non-`users/{uid}` collections. Do not deploy this partial ruleset to the shared Firebase project.
+- Static inspection only. Firestore Rules syntax/behavior has not been tested in the Emulator, and no live profile writes were performed.
+
 ## Not tested — do not claim these work yet
 
 - Real SMS delivery and OTP verification on the deployed GitHub Pages domain.
