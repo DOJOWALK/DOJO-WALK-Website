@@ -174,6 +174,7 @@ authButton.addEventListener("click", async () => {
     setBusy(true);
     try {
       await signOut(auth);
+      clearRecaptcha();
       setStatus("Signed out", "You have safely signed out of DOJO WALK.", "success");
     } catch (error) {
       setStatus("Could not sign out", friendlyError(error), "error");
@@ -204,6 +205,7 @@ newButton.addEventListener("click", () => selectAccountType(true));
 
 onAuthStateChanged(auth, user => {
   if (!user) {
+    if (!busy) clearRecaptcha();
     phoneInput.disabled = false;
     existingButton.disabled = false;
     newButton.disabled = false;
