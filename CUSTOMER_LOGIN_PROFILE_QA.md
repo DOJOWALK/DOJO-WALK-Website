@@ -310,3 +310,15 @@ Static source-code checks only. This is not a live integration test, security ce
 - No merge, branch ref update, Firebase deployment, SMS test, Emulator test, or browser E2E test was performed.
 
 **Step 39 result:** Current CI evidence is absent; existing Pages workflow is deployment-only and does not substitute for PR tests.
+
+
+## Step 41 — Re-run customer web static checks against the current profile branch
+
+- Fetched the current `customer-login.html`, `customer-profile.html`, and `customer-auth.js` from `feature/website-customer-profile-firestore` and evaluated the same structural checks locally against those exact fetched contents.
+- Results: both required HTML pages are present; the login form ID exists; all literal `getElementById(...)` references in `customer-auth.js` have matching IDs in `customer-login.html`; the local `customer-auth.js` script source exists in the branch.
+- The workflow file on the login branch contains a `pull_request` trigger and the corrected `shell: python {0}` invocation. This is source inspection and local evaluation, not a GitHub Actions run.
+- Rechecked branch ancestry: PR #3 head is `4f7f6c36a320ba44a5efec286bcdff271ba82017`; PR #4 head is `b9eb6d532990987f9130db2389426e3f5753b18d`; comparison remains diverged (PR #4 side ahead 51, behind 5) from the common base `beb261463001df1701a20e0b3fceb8264534521f`. Login HTML/JS still differ between the two branch tips, so a real conflict-aware merge/rebase is still required.
+- The GitHub connector does not expose a verified current tree SHA/read-tree workflow needed to build a complete, safe merged tree; no synthetic tree/commit or branch-ref update was attempted.
+- No Firebase, OTP/SMS, Firestore Emulator, browser E2E, deployment, or merge was performed.
+
+**Step 41 result:** Static structural checks passed locally for the fetched PR #4 files; GitHub Actions execution and branch synchronization remain outstanding.
