@@ -107,3 +107,34 @@ Additional read-only source checks:
 Do not deploy either repository's checked-in rules based on this audit. First export the currently deployed rules for the confirmed Firebase project `dojo-platform-b68a3`; reconcile profile, pet, address, booking, walker, admin and service-location operations; then test owner access, cross-user denial, profile CRUD, pet/address CRUD and batch updates, booking creation/cancellation, assigned-walker updates, and admin operations in the Firestore Emulator.
 
 **Step 59 status:** collection inventory expanded; booking-create incompatibility identified from source. No app code, rules, Firebase Console settings, merges, or deployments changed.
+
+
+### Step 60: Rules provenance check and deployment-safety gate
+
+Fetched and compared the exact checked-in files again:
+- Partner `firestore.rules`, blob `7b02a8bfb4fe80ab04d72f59966e2e09c848ffd0`.
+- Website branch `firestore.rules`, blob `1e94b14ec855dd0450d30b735b02859be13b3331`.
+- Website branch `firebase.json`, blob `0207c3fc808f51c418117f7e1facf13cf1a32b71`.
+
+#### Findings confirmed from repository source
+
+1. Website `firebase.json` points the CLI at `firestore.rules`, but does not identify a Firebase project. No `.firebaserc` was found in this branch in the earlier audit. A deployment command must not rely on an implicit/default project.
+2. Website draft rules allow only owner access to `users/{uid}` and deny all other document paths. They are not a safe shared production ruleset for Customer, Partner and Admin.
+3. Partner checked-in rules include an explicit booking-create denial and a user-profile field allowlist that excludes fields used by the Website and Flutter Customer profile writers. These are checked-in source findings only.
+4. The repository files do not establish which rules version is currently deployed to Firebase project `dojo-platform-b68a3`. No Firebase Console/deployed-rules export was available in this GitHub source check. **Deployed rules status remains UNKNOWN, not PASS and not FAIL.**
+
+#### Step 60 deployment-safety gate
+
+| Gate | Result |
+|---|---|
+| Checked-in website rules identified | PASS |
+| Checked-in partner rules identified | PASS |
+| Intended project ID known from website config | PASS (source only) |
+| Currently deployed Firestore rules retrieved | BLOCKED / NOT VERIFIED |
+| Full shared schema agreed | NOT COMPLETE |
+| Firestore Emulator rules tests run | NOT RUN |
+| Safe to deploy a rules change | NO |
+
+No rules were changed or deployed. Do not run `firebase deploy --only firestore:rules` from either repository as a workaround. The next safe action is for an authorized project operator to export/copy the active rules for the confirmed project, then run emulator tests against a reconciled shared ruleset. Never share service-account keys or private credentials in chat.
+
+**Step 60 status:** source-level deployment-safety gate documented; live Firebase rules remain unverified because repository access cannot prove deployed configuration.
