@@ -1,3 +1,17 @@
+## Executive Summary — Current Status (2026-10-19)
+
+**Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** The source review and static CI checks have passed, but this is not a complete live Firebase validation and the shared Firestore rules must not be deployed.
+
+- **Target Firebase project:** `dojo-platform-b68a3`.
+- **Latest completed audit step:** Step 64 (repository-tree/workflow inventory attempt).
+- **Static CI evidence:** run `39245116423` completed successfully for the checks described in Step 63. These checks cover source syntax and DOM/local-link contracts, not Firebase authorization.
+- **Known source-level risks:** the Website's checked-in draft rules only permit owner-scoped `users/{uid}` access and deny other collections; the checked-in Partner rules have profile-field allowlist mismatches and explicitly deny booking creation. Neither file has been verified as the rules currently deployed to Firebase.
+- **Not verified:** deployed Firestore rules, Firebase Console Phone Auth/authorized domains, live SMS OTP, Firestore Emulator permissions, browser end-to-end flows, and full Customer/Partner/Admin rules compatibility.
+- **Deployment decision:** **DO NOT DEPLOY FIRESTORE RULES** from this branch. Do not use the Website-only or Partner checked-in rules as a shared production ruleset.
+- **Next required work:** obtain the current deployed-rules export from the authorized project operator; inventory the exact repository tree and actual CI workflow; agree the canonical shared schema; prepare a complete shared rules candidate; then run Emulator positive/negative tests and browser verification before any production change.
+
+This audit is source-level evidence only. A missing file from a search or a 404 for a guessed path is recorded as an evidence gap, not proof that the file/configuration does not exist. No Firebase Console changes or production deployments were made.
+
 # Firebase Web Readiness Audit
 
 **Audit scope:** `feature/website-customer-auth-profile-integration`  
