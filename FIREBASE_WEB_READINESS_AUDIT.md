@@ -532,3 +532,38 @@ Do not merge PRs #2–#4 while they are still drafts and PR #2/#4 report mergeab
 
 No source code, workflow, Firestore rules, Firebase Console settings, PR draft state, merge state, or production data was changed in Step 72. Only this audit report was updated.
 
+# Step 73: Recheck actual PR dependency chain after audit publication
+
+Fresh GitHub PR metadata was retrieved for PRs #2–#6. This corrects any assumption that the integration PR's merged state means the whole customer website flow is now on `main`.
+
+## Observed PR state
+
+| PR | Current state | Base ← head | Current mergeability | Action |
+|---|---|---|---|---|
+| #2 Home screen polish | OPEN / DRAFT | `main` ← `feature/website-home-screen-market-polish` | Reported mergeable | Still not merged; draft status remains. |
+| #3 Customer login structure | OPEN / DRAFT | `feature/website-home-screen-market-polish` ← `feature/website-customer-login-structure` | Reported mergeable | Still not merged; draft status remains. |
+| #4 Customer profile Firestore | OPEN / DRAFT | `feature/website-customer-login-structure` ← `feature/website-customer-profile-firestore` | **NOT MERGEABLE** | Blocked. Do not merge until the GitHub conflict/mergeability issue is resolved and rules are reviewed. |
+| #5 Customer auth/profile integration | CLOSED / MERGED | `feature/website-customer-profile-firestore` ← `feature/website-customer-auth-profile-integration` | Closed; merge commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f` | Integration is merged into the profile feature branch only; it is not proof that these changes are on `main`. |
+| #6 Firebase readiness report | CLOSED / MERGED | `main` ← `docs/firebase-readiness-audit-main` | Closed; merge commit `e4b11ca74a3f4c6464078c8c06beef2506c65c44` | Report publication is complete. |
+
+PR metadata was re-read at the time of this step. The workflow-run lookup used for the current PR head SHAs returned no PR-triggered runs for PRs #2–#6 in that endpoint response; this is recorded as **no run returned by that lookup**, not as proof that CI failed or that no run exists. Previously documented run IDs remain the available evidence for the specific static checks they executed.
+
+## Step 73 decision
+
+Do not merge PR #2–#4 automatically. PR #2 and #3 remain drafts even though GitHub reports them mergeable; PR #4 is explicitly not mergeable. The safe dependency order is still #2 → #3 → #4, with PR #5 already merged into the PR #4 head branch. The next engineering action is to inspect PR #4's changed-file patch and the GitHub conflict/mergeability details, then reconcile its draft Firestore rules before resolving the PR chain. Avoid force-pushing or merging around a conflict.
+
+## Gate table
+
+| Gate | Result |
+|---|---|
+| PR #5 merged into profile feature branch | PASS |
+| PR #6 report merged into `main` | PASS |
+| PR #2 currently mergeable | PASS (metadata only; remains draft) |
+| PR #3 currently mergeable | PASS (metadata only; remains draft) |
+| PR #4 currently mergeable | **FAIL / BLOCKED** |
+| Customer auth/profile integration promoted to `main` | NO |
+| Shared Firestore rules approved and Emulator-tested | NO |
+| Production Firebase deployment | NO |
+
+No application source, workflows, Firestore rules, Firebase Console settings, or production data were changed in Step 73. This step records refreshed PR metadata only.
+
