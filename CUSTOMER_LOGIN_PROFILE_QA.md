@@ -109,3 +109,13 @@ Static source-code checks only. This is not a live integration test, security ce
 - No redirect loop was found in the inspected source: login intentionally offers a profile link rather than forcing an automatic redirect, while the protected profile redirects only when no session exists.
 - Corrected stale login copy that implied personal-profile saving was not implemented, and corrected the signed-in status text. Dog details and booking functionality remain unconnected.
 - Static string/selector/path inspection only. No browser execution, persisted-session test, real OTP, live Firestore operation, or Android end-to-end test was performed.
+
+## Step 22 — Firebase config, import paths, and profile schema review
+
+- Confirmed that both the login auth module and profile page import the same relative `./firebase-config.js` module and use Firebase JavaScript SDK version 11.10.0 for the Auth/App/Firestore modules inspected.
+- Confirmed the checked-in public web config names Firebase project `dojo-platform-b68a3`; this is client-side Firebase configuration, not a service-account credential. Authorized domains, Phone provider enablement, quotas, and deployed project settings were not checked from the Firebase Console.
+- Confirmed `customer-login.html` loads `customer-auth.js` as a module, and the profile page links back to `customer-login.html`; these relative paths are consistent with the files in the website root.
+- Found a concrete legacy DOB loader bug: the string-format regular expression in `dateOfBirthInputValue()` was over-escaped, so valid legacy `YYYY-MM-DD` strings would not match. Corrected the expression to use the intended digit patterns. Firestore Timestamp values continue through the Timestamp conversion branch.
+- Static schema check: website writes `dateOfBirth` as a Firestore Timestamp and the draft rule expects a Timestamp; profile document path remains `users/{uid}`. This does not replace a full shared-project schema/rules audit.
+- Validation performed: source string/path/config checks and exact regex correction review only. No browser execution, JavaScript runtime test, Firebase Console inspection, live Auth/Firestore request, or Emulator test was run.
+- Security/deployment warning remains: `firestore.rules` is a partial draft that denies all collections except the user's own `users/{uid}`; do not deploy it to the shared project as-is.
