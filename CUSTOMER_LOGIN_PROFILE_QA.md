@@ -322,3 +322,12 @@ Static source-code checks only. This is not a live integration test, security ce
 - No Firebase, OTP/SMS, Firestore Emulator, browser E2E, deployment, or merge was performed.
 
 **Step 41 result:** Static structural checks passed locally for the fetched PR #4 files; GitHub Actions execution and branch synchronization remain outstanding.
+
+
+## Step 73 — Merge readiness update (2026-10-19)
+
+- The homepage polish PR (#2) and customer login structure PR (#3) were merged into `main` after the homepage static validation passed. The current-head workflow-run lookup did not find a static CI run for PR #3, so login code is not recorded as CI-verified.
+- Customer auth/profile integration PR #5 was already merged into the profile feature branch as commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`.
+- To prevent an unsafe rules deployment path, the draft `firebase.json` and `firestore.rules` were removed from the profile feature branch before promoting the customer profile integration. No Firebase rules were deployed.
+- The prior note that the page and checked-in rules use the same owner-scoped path refers to the historical draft rules that were reviewed, not a currently approved or deployed ruleset. Firestore authorization is still unverified.
+- No real SMS OTP, Firebase Emulator, or browser end-to-end tests were run in this step.
