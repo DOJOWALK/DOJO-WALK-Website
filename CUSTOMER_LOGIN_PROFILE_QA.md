@@ -219,3 +219,15 @@ Static source-code checks only. This is not a live integration test, security ce
 - No PR was merged, no deployment was performed, and no Firebase rules were deployed. Live SMS/reCAPTCHA, browser/Android end-to-end, Firestore Emulator/live profile tests, and the complete shared-project rules audit remain unverified.
 
 **Step 31 result:** Base-only changes are scoped to the auth/login files, but PR #4 still cannot be safely synchronized using the available operations. Automated checks are not verified as passing.
+
+
+## Step 32 — Shared Firestore rules and profile validation review
+
+- Re-read `firestore.rules`, `customer-profile.html`, and `FIRESTORE_SECURITY_DEPLOYMENT.md` on the PR #4 branch.
+- Confirmed the draft rules allow owner-only access to `users/{uid}`, deny deletes, and deny all other collections. The deployment note correctly warns this is a database-wide ruleset and must not be deployed until customer/partner/admin collection requirements are audited.
+- Identified a validation gap for follow-up: the website calculates `age` from `dateOfBirth`, but Firestore rules independently validate only that `age` is an integer between 18 and 120 and `dateOfBirth` is a timestamp. Rules do not currently prove that the supplied age matches the date of birth or enforce the adult threshold from the date itself. Client-side validation alone is not a security boundary; add Emulator tests and choose a server/rules validation strategy before production.
+- Confirmed the profile writes a Firestore Timestamp for date of birth and server timestamps for created/updated fields. This was a static source review only, not an emulator or live Firebase test.
+- Current PR metadata: PR #2 and #3 are open/draft and reported mergeable; PR #4 is open/draft and reported not mergeable. These are GitHub metadata observations only and do not mean tests passed.
+- No Firebase rules deployment, PR merge, branch rewrite, or website deployment was performed.
+
+**Step 32 result:** Security review found no reason to deploy the draft rules; the shared-project audit and DOB/age validation strategy remain required blockers.
