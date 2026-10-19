@@ -231,3 +231,14 @@ Static source-code checks only. This is not a live integration test, security ce
 - No Firebase rules deployment, PR merge, branch rewrite, or website deployment was performed.
 
 **Step 32 result:** Security review found no reason to deploy the draft rules; the shared-project audit and DOB/age validation strategy remain required blockers.
+
+
+## Step 33 — Correct signed-in guidance and recheck
+
+- Found outdated signed-in status copy in `customer-auth.js`: it said customer profile saving still needed to be implemented even though the profile page and save flow already exist on this feature branch.
+- Updated the auth-state status message to direct signed-in customers to the profile page, while accurately stating that dog details and bookings are not connected.
+- Re-fetched both changed auth code and QA report after the write. Static check confirms the old misleading message is absent and the new guidance is present.
+- PR #4 still requires branch synchronization with PR #3. It remains open/draft/unmerged and is not reported mergeable. This step does not resolve that branch conflict.
+- No live browser, SMS/reCAPTCHA, Firebase Emulator, Firestore read/write, or Android end-to-end test was run. No PR was merged and no deployment or rules deployment occurred.
+
+**Step 33 result:** Misleading login status copy fixed and statically rechecked. Branch sync and runtime/security validation remain launch blockers.
