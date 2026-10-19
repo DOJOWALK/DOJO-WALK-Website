@@ -615,8 +615,33 @@ The audit text above contains historical Step 74 observations made before this c
 | Clean profile integration branch based on current main | PASS |
 | Customer profile integration copied without old index/terms edits | PASS |
 | Website-only draft rules / firebase.json included | NO — intentionally excluded |
-| New integration PR opened and current-head static CI passed | PENDING |
+| New integration PR #12 merged and current-head static CI passed | PASS (run 39265898037) |
 | Firebase Emulator, live OTP, browser E2E | NOT RUN |
 | Production Firestore rules deployment | NO — blocked |
 
-**Step 75 result:** clean promotion branch prepared; do not claim profile integration merged until its own PR passes the new static workflow and is merged. Live Firebase readiness remains unverified.
+**Step 75 result:** clean promotion branch prepared. The following Step 76 records the final CI and merge result. Live Firebase readiness remains unverified.
+
+
+# Step 76: Customer profile integration merged and verified
+
+- PR #12 `Integrate customer profile flow without unapproved Firestore rules` was merged into `main`; merge commit `81d231e10114eeb8dc8d9bfff06846505b89efdf`.
+- The current-head GitHub Actions workflow `Customer auth integration checks`, run `39265898037`, completed successfully. Job `Syntax and DOM contract checks` passed JavaScript module syntax, profile module syntax, HTML/local-link/DOM selector validation, and profile-load safety checks.
+- The separate `Validate static website` run `39265898046` also completed successfully for the same PR head.
+- The final main-branch profile integration includes `customer-auth.js`, `customer-login.html`, `customer-profile.html`, shared `firebase-config.js`, and the QA/deployment-gate documentation. The homepage and terms files were preserved.
+- The unapproved Website-only `firestore.rules` and `firebase.json` were not merged. The old conflicted PR #4 was closed as superseded; PR #12 is the replacement.
+
+| Final source-control gate | Result |
+|---|---|
+| Home polish PR #2 merged | PASS |
+| Login structure PR #3 merged | PASS |
+| Customer auth/profile integration PR #12 merged | PASS |
+| Static auth/profile CI run 39265898037 | PASS |
+| Static website CI run 39265898046 | PASS |
+| Unapproved Website-only Firestore rules included in main | NO |
+| Deployed Firestore rules retrieved | NOT VERIFIED |
+| Shared Customer/Partner/Admin rules approved | NO |
+| Firestore Emulator authorization tests | NOT RUN |
+| Real SMS OTP / browser E2E | NOT RUN |
+| Production Firebase rules deployment | NO — blocked |
+
+**Step 76 result:** the website customer login/profile source integration is merged into `main` and its static CI passed. This is not a claim of live Firebase readiness; deployed rules, Phone Auth settings, SMS OTP, Emulator authorization, and browser end-to-end behavior remain unverified.
