@@ -137,6 +137,11 @@ form.addEventListener("submit", async event => {
     return;
   }
   const age = ageOn(dateOfBirth);
+  // Firestore rules require the verified Firebase Auth phone claim.
+  if (!currentUser.phoneNumber) {
+    status("Your verified mobile number is missing from this sign-in session. Please sign out and sign in again with your phone number.", "error");
+    return;
+  }
   if (name.length < 2 || name.length > 100) {
     status("Enter a name between 2 and 100 characters.", "error");
     return;
@@ -157,14 +162,18 @@ form.addEventListener("submit", async event => {
       // Match the Flutter Customer app: store dateOfBirth as Firestore Timestamp.
       dateOfBirth: Timestamp.fromDate(new Date(dateOfBirth + "T00:00:00")),
       age,
-      phoneNumber: currentUser.phoneNumber || "",
+      phoneNumber: currentUser.phoneNumber,
       email: currentUser.email || "",
       photoUrl: savedPhotoUrl,
       role: "customer",
       profileCompleted: true,
       updatedAt: serverTimestamp()
     };
-    if (!existingSnapshot.exists() || !existingSnapshot.data()?.createdAt) {
+    const existingCreatedAt = existingSnapshot.exists()
+      ? existingSnapshot.data()?.createdAt
+      : null;
+    // Repair a missing or malformed createdAt value, but preserve a valid Timestamp.
+    if (!existingCreatedAt || typeof existingCreatedAt.toDate !== "function") {
       profileData.createdAt = serverTimestamp();
     }
     await setDoc(ref, profileData, { merge: true });
