@@ -671,3 +671,33 @@ Read-only verification on `main`:
 
 **Step 77 result:** the website integration and static CI evidence are reconciled in the report. This does not complete live Firebase readiness. The next blocking evidence is the currently deployed shared rules and project auth settings, followed by approved shared-schema Emulator tests.
 
+# Step 78: Post-merge customer auth/profile source review
+
+Read-only review of the current `main` versions of `customer-auth.js`, `customer-profile.html`, and `firebase-config.js` (blob SHAs: `f618eacc4290a45d3c8148d0245a8e2f2a2b0a69`, `e4c41d279640e6c62ee8a29786041d871ad7f922`, and `f097543e7514338f44aab286132d468f66e9d207`).
+
+## Findings
+
+1. **Shared project config:** the auth and profile modules both import the same public `firebase-config.js`, whose `projectId` is `dojo-platform-b68a3`. This confirms source consistency only, not that Console settings or deployed rules match.
+2. **Phone auth flow:** the login module validates a 10-digit Indian mobile number, uses Firebase Phone Auth with reCAPTCHA, validates a six-digit OTP, and presents explicit status messages. Real SMS delivery, authorized domains, reCAPTCHA behavior on the production hostname, and session restoration were not tested in a browser.
+3. **Profile data access:** the profile module scopes the document path to `users/{currentUser.uid}`, waits for the first `getDoc` attempt to succeed before enabling save, validates name and age (18–120), requires a Firebase phone claim, and uses `setDoc(..., {merge:true})` to preserve unrelated fields. These are client-side behaviors; Firestore Security Rules must independently enforce owner-only access and field constraints.
+4. **Client-controlled profile fields:** the client writes `role: "customer"`, `uid`, `profileCompleted`, `age`, and `email`. Never treat a client-written `role` field as proof of authorization. The shared rules must prevent privilege escalation, restrict allowed fields and immutable identifiers, and preserve fields used by the Flutter Customer, Partner, and Admin clients. This audit did not establish the currently deployed rules.
+5. **Account-type choice:** “Existing user” / “New user” currently changes the displayed copy and heading; the source does not enforce separate server-side account-creation or account-existence policies. Do not treat that UI selection as an authorization control.
+6. **Feature boundary:** the login page explicitly states that dog details, addresses, and bookings are not connected to this website flow. No booking is created by OTP verification.
+7. **DOB serialization:** the client stores `dateOfBirth` as a Firestore Timestamp, matching the inspected Flutter Customer save path. Emulator tests are still needed to verify rules accept valid Timestamp values and reject invalid ages/fields.
+
+## Step 78 gate table
+
+| Gate | Result |
+|---|---|
+| Main-branch auth/profile/config source reviewed | PASS |
+| Auth/profile use same public Firebase config | PASS |
+| Client-side age and profile-load guards found | PASS (source inspection only) |
+| Server-side role protection verified | NOT VERIFIED — requires deployed/shared rules |
+| Owner-only and cross-user access tests | NOT RUN |
+| Live OTP / production authorized domain | NOT VERIFIED |
+| Dog, address, booking website integration | NOT IMPLEMENTED in this login/profile flow |
+| Firebase Console or production rules changed | NO |
+| Safe to deploy Firestore rules | NO — blocked pending shared rules review and Emulator tests |
+
+**Step 78 result:** source-level review is recorded. No app code, Firestore rules, Firebase Console settings, or production data were changed. The next meaningful gate is an authorized export of the deployed Firestore rules and confirmation of Firebase Authentication settings; without those, production readiness cannot be proven or safely fixed from source code alone.
+
