@@ -1,18 +1,17 @@
-## Executive Summary — Current Status (2026-10-19)
+## Executive Summary — Current Status (2026-10-20)
 
-**Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** Source-level review and static CI checks have passed, but live Firebase behavior and shared Firestore authorization remain unverified.
+**Overall result: Website source integration is merged; live Firebase production readiness is still NOT VERIFIED.**
 
-- **Target Firebase project:** `dojo-platform-b68a3`.
-- **Latest report update:** Step 72. Current PR chain and CI evidence were reconciled; report changes are awaiting PR review/merge. The report-only PR #6 is merged into `main`; report content has been verified on `main`.
-- **Customer login/profile integration PR #5:** merged successfully into `feature/website-customer-profile-firestore` (merge commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`). It is **not merged into `main`**.
-- **Remaining draft PR chain:** PR #2 targets `main`; PR #3 targets the home-polish branch; PR #4 targets the customer-login branch. All three are still open drafts and must be reviewed in dependency order before promotion.
-- **Static CI evidence:** run `39248019883` for the auth integration passed syntax, DOM/local-link and profile-load guard checks. This is not Firebase Emulator, live OTP, or browser end-to-end validation.
-- **Known source-level risks:** Website draft rules only allow owner-scoped `users/{uid}` access and deny other collections; checked-in Partner rules have profile-field allowlist mismatches and explicitly deny booking creation. Neither file is verified as the rules currently deployed to Firebase.
-- **Not verified:** deployed Firestore rules, Firebase Console Phone Auth/authorized domains, live SMS OTP, Firestore Emulator permission tests, browser E2E, and full Customer/Partner/Admin rules compatibility.
-- **Deployment decision:** **DO NOT DEPLOY FIRESTORE RULES** from this branch. Do not use Website-only or Partner checked-in rules as a shared production ruleset.
-- **Next required work:** review the remaining PR chain and code diffs; obtain the currently deployed rules export from the authorized project operator; agree the canonical shared schema; prepare a complete shared rules candidate; then run positive/negative Emulator tests and browser verification before any production change.
+- **Target Firebase project:** `dojo-platform-b68a3` (from the public client config; this does not prove live Console settings).
+- **Current source-control status:** Home polish PR #2, login structure PR #3, and customer login/profile integration PR #12 are merged into `main`. PR #12 merge commit: `81d231e10114eeb8dc8d9bfff06846505b89efdf`. Earlier PR #5 was a separate branch-chain PR and should not be used as the current source of truth.
+- **Current-head static CI:** auth integration run `39265898037` and static website run `39265898046` both completed successfully. Their jobs were re-fetched and verified. These are static checks, not live Firebase tests.
+- **Main-branch files verified:** `customer-auth.js`, `customer-login.html`, `customer-profile.html`, and `firebase-config.js` are present. Root `firestore.rules` and root `firebase.json` returned 404 on `main`; this is only a root-path finding and does not identify deployed Firebase rules.
+- **Known cross-repo risk:** the previously inspected Partner checked-in rules have a user-profile field allowlist mismatch and explicitly deny booking creation. The currently deployed rules are still unknown.
+- **Not verified:** deployed Firestore rules export, Firebase Console Phone Auth settings and authorized domains, real SMS OTP, Firestore Emulator authorization tests, and browser end-to-end behavior.
+- **Deployment decision:** **DO NOT deploy any Firestore rules from the website or Partner repo as a workaround.** No production rules deployment was performed.
+- **Next gate:** authorized project operator must provide/export the currently deployed rules; then reconcile Customer, Partner, and Admin schema and produce a reviewed shared-rules candidate before Emulator positive/negative tests and browser verification.
 
-Missing paths or unsuccessful searches are evidence gaps, not proof that a file/configuration does not exist. No Firebase Console settings or production deployments were changed.
+The report distinguishes verified source/CI evidence from unverified live-project state. A root-path 404 or search miss is not proof that a file or configuration is absent everywhere.
 # Firebase Web Readiness Audit
 
 **Audit scope:** `feature/website-customer-auth-profile-integration`  
@@ -645,3 +644,30 @@ The audit text above contains historical Step 74 observations made before this c
 | Production Firebase rules deployment | NO — blocked |
 
 **Step 76 result:** the website customer login/profile source integration is merged into `main` and its static CI passed. This is not a claim of live Firebase readiness; deployed rules, Phone Auth settings, SMS OTP, Emulator authorization, and browser end-to-end behavior remain unverified.
+
+
+# Step 77: Reconcile main-branch source, CI evidence, and executive summary
+
+Read-only verification on `main`:
+- Confirmed `customer-auth.js`, `customer-login.html`, `customer-profile.html`, and `firebase-config.js` exist and fetched their current blob metadata.
+- Root `firestore.rules` and `firebase.json` each returned 404. This is recorded narrowly as a root-path result; it does not reveal or prove the contents of currently deployed Firebase rules.
+- Re-fetched workflow jobs for auth integration run `39265898037`: job `Syntax and DOM contract checks` completed successfully. Steps passed for auth module syntax, extracted profile module syntax, profile syntax validation, HTML/local-link/DOM selector validation, and profile-load safety.
+- Re-fetched workflow jobs for static website run `39265898046`: job `validate` completed successfully for HTML links, local assets, and preview forms.
+- Confirmed the report's previous executive summary was stale (it described Step 72 and incorrectly represented the customer integration as not merged to `main`). Replaced it with a current summary based on the merged PR #12 and its verified CI runs.
+
+| Step 77 gate | Result |
+|---|---|
+| Current customer auth/profile source files found on main | PASS |
+| Auth integration static CI run verified | PASS |
+| Static website validation run verified | PASS |
+| Executive summary reconciled with Step 76 | PASS |
+| Root Firestore rules file found on main | NOT FOUND AT ROOT |
+| Root Firebase CLI config found on main | NOT FOUND AT ROOT |
+| Currently deployed Firestore rules retrieved | NOT VERIFIED |
+| Firebase Console Phone Auth / authorized domains | NOT VERIFIED |
+| Emulator authorization tests | NOT RUN |
+| Live SMS OTP / browser E2E | NOT RUN |
+| Production Firebase rules deployment | NO — blocked |
+
+**Step 77 result:** the website integration and static CI evidence are reconciled in the report. This does not complete live Firebase readiness. The next blocking evidence is the currently deployed shared rules and project auth settings, followed by approved shared-schema Emulator tests.
+
