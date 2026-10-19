@@ -275,3 +275,15 @@ Static source-code checks only. This is not a live integration test, security ce
 - No PR was merged, no branch ref was moved, and no Firebase deployment or runtime test was performed.
 
 **Step 36 result:** Branch ancestry rechecked; overlapping auth/login changes and inconsistent PR metadata confirmed as blockers to safe automated synchronization.
+
+
+## Step 37 — Repeatable cross-file static consistency checks
+
+- Re-fetched the login HTML, auth module, profile page, Firebase web config, Firestore rules, and Firebase CLI config from the PR #4 branch.
+- Static checks matched all nine login DOM IDs to both HTML and auth-module lookups; the OTP restart handler and pending-confirmation reset remain present; the old account-type toggle identifiers remain absent.
+- Profile code still contains DOB-to-Timestamp conversion and client-side age bounds of 18–120. Rules still include owner UID and Firebase phone-claim checks, a catch-all deny, and `firebase.json` still points to `firestore.rules`.
+- Confirmed the fetched Firebase web config has no obvious service-account private-key material. This is a pattern-based check, not a full secret scan.
+- These checks inspect source text only. They do not prove JavaScript executes correctly in a browser, Firebase Auth/Firestore works, the rules are safe for other apps, or the site renders on Android. No Emulator, SMS, browser E2E, or production test was run.
+- PR #4 remains open/draft and not mergeable. No merge, ref update, or deployment was performed.
+
+**Step 37 result:** Cross-file static checks passed for the listed source invariants; runtime/security validation and safe branch synchronization remain outstanding.
