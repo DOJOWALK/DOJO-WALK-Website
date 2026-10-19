@@ -24,6 +24,13 @@ Date: 2026-10-19
 - The current draft `firestore.rules` denies every collection other than `users/{userId}`. Since Firestore rules apply to the shared database, deploying this draft without auditing the customer app, partner app, admin portal, and existing collections could break them.
 - The rules restrict updates to a set of profile fields, but they have not been run through Firebase Emulator tests or deployed-rule tests.
 
+## Shared-schema compatibility findings
+
+- The existing Flutter customer app writes `users/{uid}.dateOfBirth` as a Firestore `Timestamp` (in `lib/features/profile/screens/name_setup_screen.dart`), while this website writes `dateOfBirth` as a `YYYY-MM-DD` string. The customer app's current parser accepts both Timestamp and String, but the draft website rules only accept String. This is a mixed-type schema and must be standardized deliberately before production.
+- The existing customer app stores `photoUrl` and reads the shared `users/{uid}` document. The website currently preserves a loaded photo URL but does not upload/change profile photos. Confirm all required fields and types across clients before changing rules.
+- The Partner repository has its own Firestore rules for `walkers/{walkerUid}` and other collections. This website's draft rules are not a complete shared-project ruleset and must not replace the canonical rules used by Customer, Partner, and Admin.
+- Compatibility search is a focused source review, not a complete audit of every repository, collection, Cloud Function, or deployed rule.
+
 ## Not tested — do not claim these work yet
 
 - Real SMS delivery and OTP verification on the deployed GitHub Pages domain.
