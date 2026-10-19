@@ -1,0 +1,66 @@
+name: Customer web static checks
+
+on:
+  pull_request:
+    branches:
+      - feature/website-customer-login-structure
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  customer-web-static:
+    name: Validate customer login/profile structure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull request code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Validate HTML and JavaScript references
+        shell: python {0}
+        run: |
+          import pathlib
+          import re
+          import sys
+
+          root = pathlib.Path(".")
+          errors = []
+
+          pages = ["customer-login.html", "customer-profile.html"]
+          for page_name in pages:
+              page_path = root / page_name
+              if not page_path.is_file():
+                  errors.append(f"Missing required page: {page_name}")
+                  continue
+
+              html = page_path.read_text(encoding="utf-8")
+              for src in re.findall(r'<script[^>]+src=["\']([^"\']+)["\']', html, re.I):
+                  if src.startswith(("https://", "http://", "//", "data:")):
+                      continue
+                  local_src = src.split("?", 1)[0].split("#", 1)[0]
+                  if local_src and not (page_path.parent / local_src).is_file():
+                      errors.append(f"{page_name}: missing script source {src}")
+
+          login_html_path = root / "customer-login.html"
+          auth_js_path = root / "customer-auth.js"
+          if login_html_path.is_file() and auth_js_path.is_file():
+              html = login_html_path.read_text(encoding="utf-8")
+              js = auth_js_path.read_text(encoding="utf-8")
+              html_ids = set(re.findall(r'\bid=["\']([^"\']+)["\']', html))
+              js_ids = set(re.findall(r'getElementById\(["\']([^"\']+)["\']\)', js))
+              for missing_id in sorted(js_ids - html_ids):
+                  errors.append(f"customer-auth.js references missing login DOM id: {missing_id}")
+              if "customer-login-form" not in html_ids:
+                  errors.append("Login form id is missing")
+          if errors:
+              print("\n".join(f"ERROR: {item}" for item in errors))
+              sys.exit(1)
+
+          print("Customer login/profile static structure checks passed.")
+          print("Note: these checks do not test Firebase, OTP/SMS, Firestore rules, or browser behavior.")
