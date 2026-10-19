@@ -1,0 +1,87 @@
+name: Customer auth integration checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  customer-auth-static:
+    name: Syntax and DOM contract checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check external auth module syntax
+        run: node --input-type=module --check < customer-auth.js
+
+      - name: Extract and check profile module syntax
+        shell: python {0}
+        run: |
+          import pathlib
+          import re
+          import sys
+
+          source = pathlib.Path("customer-profile.html").read_text(encoding="utf-8")
+          match = re.search(r'<script type="module">([\s\S]*?)</script>', source, re.I)
+          if not match:
+              print("ERROR: customer-profile.html has no inline module script")
+              sys.exit(1)
+          pathlib.Path("/tmp/customer-profile-module.js").write_text(match.group(1), encoding="utf-8")
+      - name: Validate profile module syntax
+        run: node --input-type=module --check < /tmp/customer-profile-module.js
+
+      - name: Validate HTML, local links, and DOM selectors
+        shell: python {0}
+        run: |
+          import pathlib
+          import re
+          import sys
+
+          root = pathlib.Path(".")
+          errors = []
+          for page in ("customer-login.html", "customer-profile.html"):
+              path = root / page
+              if not path.is_file():
+                  errors.append(f"Missing page: {page}")
+                  continue
+              html = path.read_text(encoding="utf-8")
+              ids = re.findall(r'\bid=["\']([^"\']+)["\']', html)
+              duplicates = sorted({item for item in ids if ids.count(item) > 1})
+              if duplicates:
+                  errors.append(f"{page}: duplicate IDs: {', '.join(duplicates)}")
+              for src in re.findall(r'<script[^>]+src=["\']([^"\']+)["\']', html, re.I):
+                  if src.startswith(("https://", "http://", "//", "data:")):
+                      continue
+                  local_src = src.split("?", 1)[0].split("#", 1)[0]
+                  if local_src and not (path.parent / local_src).is_file():
+                      errors.append(f"{page}: missing local script {src}")
+
+          login = (root / "customer-login.html").read_text(encoding="utf-8")
+          auth = (root / "customer-auth.js").read_text(encoding="utf-8")
+          html_ids = set(re.findall(r'\bid=["\']([^"\']+)["\']', login))
+          js_ids = set(re.findall(r'getElementById\(["\']([^"\']+)["\']\)', auth))
+          for missing in sorted(js_ids - html_ids):
+              errors.append(f"customer-auth.js references missing login DOM id: {missing}")
+          for required in ("existing-user", "new-user", "change-number-button", "customer-login-form", "phone", "otp-code", "recaptcha-container", "auth-button"):
+              if required not in html_ids:
+                  errors.append(f"customer-login.html missing required id: {required}")
+          profile = (root / "customer-profile.html").read_text(encoding="utf-8")
+          for required in ("profileLoadComplete", "if (!profileLoadComplete)", "Saving is disabled to protect existing data"):
+              if required not in profile:
+                  errors.append(f"customer-profile.html missing load-safety guard: {required}")
+          if errors:
+              print("\n".join("ERROR: " + item for item in errors))
+              sys.exit(1)
+          print("Customer auth/profile syntax, DOM, local script, and load-safety checks passed.")
+          print("Note: Firebase network behavior, SMS OTP, Firestore Rules, and browser E2E are not tested.")
