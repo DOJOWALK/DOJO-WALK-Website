@@ -3,7 +3,7 @@
 **Overall result: PARTIAL / PRODUCTION READINESS NOT VERIFIED.** Source-level review and static CI checks have passed, but live Firebase behavior and shared Firestore authorization remain unverified.
 
 - **Target Firebase project:** `dojo-platform-b68a3`.
-- **Latest report update:** Step 71. The report-only PR #6 is merged into `main`; report content has been verified on `main`.
+- **Latest report update:** Step 72. Current PR chain and CI evidence were reconciled; report changes are awaiting PR review/merge. The report-only PR #6 is merged into `main`; report content has been verified on `main`.
 - **Customer login/profile integration PR #5:** merged successfully into `feature/website-customer-profile-firestore` (merge commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`). It is **not merged into `main`**.
 - **Remaining draft PR chain:** PR #2 targets `main`; PR #3 targets the home-polish branch; PR #4 targets the customer-login branch. All three are still open drafts and must be reviewed in dependency order before promotion.
 - **Static CI evidence:** run `39248019883` for the auth integration passed syntax, DOM/local-link and profile-load guard checks. This is not Firebase Emulator, live OTP, or browser end-to-end validation.
@@ -491,4 +491,44 @@ Re-checked GitHub PR metadata and fetched the audit report from `main`.
 | Production rules deployment | NO |
 
 No application source, Firestore rules, Firebase Console configuration, or PR merge state was changed in Step 71; this step reconciles the audit summary with verified GitHub metadata.
+
+# Step 72: Current PR chain, merge state, and CI evidence reconciliation
+
+Read-only GitHub metadata and changed-file patches were checked for PRs #2–#6. This section records the current observed state as of 2026-10-19.
+
+## Current PR state
+
+| PR | Scope | State | Base → head | Decision |
+|---|---|---|---|---|
+| #2 | Home screen polish | OPEN / DRAFT | `main` ← `feature/website-home-screen-market-polish` | Do not merge yet: draft remains, GitHub currently reports mergeability false, although its known static website validation run passed. Resolve the mergeability state and complete review first. |
+| #3 | Customer login structure | OPEN / DRAFT | `feature/website-home-screen-market-polish` ← `feature/website-customer-login-structure` | Do not merge yet: draft remains; no PR-triggered run was returned by the inspected workflow-run endpoint for the current head SHA. |
+| #4 | Profile Firestore integration and draft rules | OPEN / DRAFT | `feature/website-customer-login-structure` ← `feature/website-customer-profile-firestore` | Do not merge yet: draft remains and GitHub currently reports mergeability false. It introduces a website-only Firestore rules file that denies all collections except the user profile; this is not a shared production ruleset. |
+| #5 | Customer auth/profile integration | CLOSED / MERGED | `feature/website-customer-profile-firestore` ← `feature/website-customer-auth-profile-integration` | Merge verified; merge commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`. This promotes the integration only into the profile feature branch, not to `main`. |
+| #6 | Firebase readiness audit report | CLOSED / MERGED | `main` ← `docs/firebase-readiness-audit-main` | Merge verified; merge commit `e4b11ca74a3f4c6464078c8c06beef2506c65c44`. |
+
+## CI evidence checked
+
+- PR #2 head commit `08dd6ae2116ba2ea58bb4cbda7e7e5f3c93ea32f`: workflow run `39176442781`, “Validate static website”, completed successfully. This is a static website validation only.
+- PR #3 head commit `4f7f6c36a320ba44a5efec286bcdff271ba82017`: the inspected PR-triggered workflow-run query returned no runs. This is **not** evidence of a failure or a pass; CI status remains unverified for this check.
+- PR #4 head commit `80c3ecfc2e4acd9b2c1d15bb05d2e723fae0bf2f`: the inspected PR-triggered workflow-run query returned no runs. This is **not** evidence of a failure or a pass; CI status remains unverified for this check.
+- PR #5's earlier static auth-integration checks do not establish Firebase Emulator, live OTP, browser E2E, or deployed-rules correctness.
+
+## Step 72 decision and next gate
+
+Do not merge PRs #2–#4 while they are still drafts and PR #2/#4 report mergeability false. The dependency order remains #2 → #3 → #4, with PR #5 already incorporated into the #4 head branch. First resolve the current GitHub mergeability/conflict state, make each PR ready for review, and validate the combined code and static CI in dependency order. Keep the shared Firestore rules deployment blocked until the actual deployed rules are obtained, the shared Customer/Partner/Admin schema is agreed, and positive/negative Emulator tests are executed.
+
+| Gate | Result |
+|---|---|
+| PR #5 merged into profile feature branch | PASS |
+| PR #6 report merged into `main` | PASS |
+| PR #2 static website run | PASS (static scope only) |
+| PR #3 current-head CI result confirmed | NOT VERIFIED |
+| PR #4 current-head CI result confirmed | NOT VERIFIED |
+| PR #2–#4 ready for review | NO — remain draft |
+| PR #2 and #4 mergeability | BLOCKED / FALSE at last metadata check |
+| Customer integration code on `main` | NO |
+| Shared Firestore rules approved and Emulator-tested | NO |
+| Production Firebase rules deployment | NO |
+
+No source code, workflow, Firestore rules, Firebase Console settings, PR draft state, merge state, or production data was changed in Step 72. Only this audit report was updated.
 
