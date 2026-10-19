@@ -18,7 +18,6 @@ const otpInput = document.getElementById("otp-code");
 const otpRow = document.getElementById("otp-row");
 const authButton = document.getElementById("auth-button");
 const changeNumberButton = document.getElementById("change-number-button");
-const accountHint = document.getElementById("account-hint");
 const authStatusTitle = document.getElementById("auth-status-title");
 const authStatusCopy = document.getElementById("auth-status-copy");
 const recaptchaContainer = document.getElementById("recaptcha-container");
