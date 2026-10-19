@@ -597,3 +597,26 @@ The changed-file list and commit comparison for PR #4 were inspected after the r
 
 Only this audit report was changed in Step 74. No application code, branches, workflow, Firestore rules, Firebase Console settings, or production data were modified.
 
+
+
+# Step 75: Clean customer profile promotion branch prepared
+
+Following the Step 74 divergence finding, a fresh branch `feature/customer-profile-integration-clean` was created from the current `main` commit after PR #11 merged the reusable static validation workflow. Only the intended customer auth/profile implementation and its QA/security documentation were copied onto this clean branch. The current homepage and terms pages were preserved from `main` rather than replaying old branch versions.
+
+The old Website-only `firebase.json` and `firestore.rules` were not copied. They had already been removed from the old profile branch because the rules deny access to every collection except the top-level owner profile and are not a shared DOJO WALK ruleset. No deployed Firebase rules or Console settings were changed.
+
+The audit text above contains historical Step 74 observations made before this clean branch was prepared; its notes about the old PR #4 branch's divergence and draft files refer to that old branch. This new branch is a separate, clean promotion attempt and must be validated independently by its own pull request and CI result.
+
+| Gate | Result |
+|---|---|
+| PR #2 home polish merged to main | PASS |
+| PR #3 login structure merged to main | PASS; CI status for its head was not verified |
+| PR #11 static CI workflow for main PRs merged | PASS |
+| Clean profile integration branch based on current main | PASS |
+| Customer profile integration copied without old index/terms edits | PASS |
+| Website-only draft rules / firebase.json included | NO — intentionally excluded |
+| New integration PR opened and current-head static CI passed | PENDING |
+| Firebase Emulator, live OTP, browser E2E | NOT RUN |
+| Production Firestore rules deployment | NO — blocked |
+
+**Step 75 result:** clean promotion branch prepared; do not claim profile integration merged until its own PR passes the new static workflow and is merged. Live Firebase readiness remains unverified.
