@@ -373,3 +373,37 @@ GitHub Actions run `39248019883`, “Customer auth integration checks” (run nu
 
 No workflow, auth/profile application code, Firestore rules, Firebase Console settings, PR #5 status, or production environment was changed in Step 67. This step updates audit evidence only.
 
+# Step 68: Customer Auth/Profile PR readiness re-check
+
+Rechecked PR #5 and the exact source files on `feature/website-customer-auth-profile-integration` after the report-only PR #6 merge.
+
+#### Current PR state
+- PR #5: `https://github.com/dojoplatform2026/DOJO-WALK-Website-/pull/5`
+- State: OPEN, DRAFT; mergeable according to GitHub metadata, but **not approved for merge by this audit**.
+- Base: `feature/website-customer-profile-firestore`.
+- Head SHA: `6682af62374b4943e05c50903c18e84e09082720`.
+- Changed files reported: `.github/workflows/customer-auth-integration-checks.yml`, `FIREBASE_WEB_READINESS_AUDIT.md`, `customer-auth.js`, `customer-login.html`, and `customer-profile.html`.
+
+#### Source and CI evidence rechecked
+- `firebase-config.js` blob SHA `f097543e7514338f44aab286132d468f66e9d207` still names project `dojo-platform-b68a3`.
+- `customer-auth.js` blob SHA `f618eacc4290a45d3c8148d0245a8e2f2a2b0a69` contains Phone Auth sign-in and `RecaptchaVerifier` usage.
+- `customer-profile.html` blob SHA `e4c41d279640e6c62ee8a29786041d871ad7f922` retains the `profileLoadComplete` save guard.
+- Workflow run `39248019883` (“Customer auth integration checks”, run 13) completed `success`. The job steps for JS module syntax, profile module syntax, and HTML/local-link/DOM/load-safety validation completed successfully.
+- This successful run is static CI only. It does not verify real SMS, Firebase authorized domains, deployed Firestore Rules, Emulator authorization, or browser end-to-end behavior.
+
+#### Merge gate
+| Requirement | Result |
+|---|---|
+| Customer login/profile static checks | PASS |
+| Current PR #5 state recorded | PASS — still draft/open |
+| Live Phone Auth / SMS OTP verified | NOT RUN |
+| Deployed Firestore Rules retrieved | NOT VERIFIED |
+| Shared Customer/Partner/Admin schema and rules reconciled | NOT COMPLETE |
+| Firestore Emulator positive/negative tests | NOT RUN |
+| Browser E2E for login/profile | NOT RUN |
+| Merge PR #5 based on current evidence | NO — keep draft/open |
+
+**Decision:** PR #5 remains open and draft. A green static workflow is insufficient to establish shared Firestore compatibility. The checked-in Partner rules reviewed earlier still contain a booking-create denial and profile-field allowlist conflicts; deployment status of those rules remains unknown. Do not deploy any rules or treat checked-in rules as the deployed configuration.
+
+**Step 68 status:** PR and source evidence rechecked and documented. No application source, workflow, Firebase Console settings, Firestore rules, PR state, merge, or production deployment was changed in this step. The remaining hard blocker is access to an authoritative export/snapshot of the currently deployed rules plus a reviewed shared rules candidate before Emulator tests can meaningfully validate the intended behavior.
+
