@@ -207,6 +207,6 @@ onAuthStateChanged(auth, user => {
   authButton.style.cursor = "pointer";
   authButton.style.background = "linear-gradient(135deg,#ff9b36,#ff7900)";
   authButton.style.color = "#fff";
-  setStatus("Signed in to Firebase", "Phone authentication is active for this session. Customer profile saving and booking access still need to be implemented.", "success");
+  setStatus("Signed in to Firebase", "Phone authentication is active. Continue to your customer profile to view or save your personal details. Dog details and bookings are not connected yet.", "success");
   document.getElementById("profile-next-step").hidden = false;
 });
