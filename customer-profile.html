@@ -72,7 +72,7 @@ function ageOn(dateString) {
 
 function dateOfBirthInputValue(value) {
   if (typeof value === "string") {
-    return /^\\d{4}-\\d{2}-\\d{2}$/.test(value) && isValidDateOfBirth(value)
+    return /^\d{4}-\d{2}-\d{2}$/.test(value) && isValidDateOfBirth(value)
       ? value
       : "";
   }
