@@ -29,3 +29,21 @@
 **Configuration source review: PASS** — project ID matches the expected shared project and both web pages import the same config module.
 
 **Production readiness: NOT VERIFIED** — Firebase Console settings, live OTP, emulator behavior, and browser E2E have not been tested. No deployment was performed.
+
+
+## Cross-repository schema compatibility check (follow-up)
+
+A read-only inspection of `dojoplatform2026/dojo-partner/firestore.rules` (blob SHA `7b02a8bfb4fe80ab04d72f59966e2e09c848ffd0`) found rules for these top-level collections: `admin_users`, `walkers`, `users`, `pets`, `addresses`, `bookings`, `walk_requests`, `walker_reviews`, `zones`, `customers`, `coupons`, `payments`, and `audit_logs`, plus nested walker/customer subcollections.
+
+The partner repository's `users/{userId}` create allowlist currently includes `name`, `phoneNumber`, `email`, `role`, `dateOfBirth`, `dob`, `age`, `photoUrl`, `profileImage`, `createdAt`, `updatedAt`, `language`, and `notificationEnabled`. It does not allow `uid`, `gender`, or `profileCompleted` on create. The website profile code writes `uid`, `gender`, `dateOfBirth`, `age`, `phoneNumber`, `email`, `photoUrl`, `role`, `profileCompleted`, `createdAt`, and `updatedAt`. Therefore, **the website's current profile create payload is incompatible with the partner repository's checked-in draft rules** unless the schema/rules or website payload are reconciled.
+
+The partner rules' update allowlist also does not include every website-managed field, so profile updates need a field-by-field compatibility review as well. This repository comparison does not prove that the partner rules are the currently deployed Firebase rules; the deployed rules must be exported from Firebase Console before any final decision.
+
+The customer repository's root `firestore.rules` and `firebase.json` were not found at those paths on its default branch during this check; no conclusion is made about its complete rules setup. Admin repository rules could not be located at root paths in this check either. These are evidence gaps, not proof that no rules exist.
+
+### Required resolution
+
+- Decide the canonical `users/{uid}` schema for Customer, Partner, and Admin consumers.
+- Prefer a backward-compatible change set: preserve existing profile fields and role protections, define optional/required fields explicitly, and ensure only the owner can update private profile fields.
+- Add emulator tests for website profile create/update against the **complete shared ruleset**, plus existing partner and admin flows.
+- Do not deploy either the website draft rules or the partner repository rules based on this repository comparison alone.
