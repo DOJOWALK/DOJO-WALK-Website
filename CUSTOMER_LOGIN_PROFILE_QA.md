@@ -175,3 +175,13 @@ Static source-code checks only. This is not a live integration test, security ce
 - No PR was merged, marked ready, or deployed.
 
 **Step 27 result:** Scoped navigation review completed. The change set is not yet production-verified and should remain draft until the runtime/security blockers are resolved.
+
+## Step 28 — Remove misleading Existing/New account toggle
+
+- Removed the Existing user/New user selector because it only changed page copy and did not control Firebase account existence or the underlying phone-auth flow.
+- Replaced it with neutral copy explaining that the same phone-number flow is used for sign-in, while Firebase handles account creation according to its Auth configuration.
+- Simplified the success status so it no longer claims the selected toggle determined the account type. The profile next-step link remains available after successful sign-in.
+- Static checks re-fetch the HTML and auth module to verify the old toggle IDs/handlers and the `isNewUser` conditional are gone, while the phone-lock/restart flow remains.
+- No browser execution, live Firebase Auth test, real SMS/OTP, Firestore test, or Android test was run. No merge or deployment was performed.
+
+**Step 28 result:** The UI no longer implies that the Existing/New buttons control Firebase account creation. Runtime and shared-rules security checks remain pre-merge blockers.
