@@ -142,3 +142,14 @@ Static source-code checks only. This is not a live integration test, security ce
 - No code/rules change, merge, or deployment was made. No browser runtime, real SMS, Firebase Emulator, live Auth/Firestore, or Android test was run.
 
 **Step 24 result:** Static edge-case review completed. One login state/UX issue is documented for the next step. The partial Firestore rules must not be deployed to the shared project as-is.
+
+## Step 25 — OTP phone-change/restart flow
+
+- Added a visible **Change number / restart** control to the login page; it remains hidden until Firebase successfully sends an OTP.
+- Once an OTP is requested, the phone input and Existing/New account-choice buttons are disabled so the displayed number cannot drift away from the pending Firebase confirmation result.
+- The restart control clears the pending confirmation result and OTP input, hides the OTP row, re-enables the phone/account-choice controls, resets the primary action to **Send OTP**, clears the old reCAPTCHA verifier/container, and prompts the user to enter the correct number and request a new OTP.
+- The restart control is disabled while the flow is busy and is hidden after sign-in; the auth-state listener also hides it for an already signed-in session.
+- Static checks reviewed the new HTML control ID, JavaScript selector/listener, phone-lock state after OTP send, reset state, and signed-in/signed-out handling.
+- No browser execution, real SMS/OTP, Firebase Emulator, live Auth/Firestore, or Android test was run. No merge or deployment was performed.
+
+**Step 25 result:** The mismatch between an editable phone field and the pending OTP confirmation is addressed in source. Runtime verification remains outstanding; PR #4 remains a draft, and the partial Firestore rules must not be deployed to the shared project as-is.
