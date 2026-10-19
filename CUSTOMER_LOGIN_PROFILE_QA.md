@@ -207,3 +207,15 @@ Static source-code checks only. This is not a live integration test, security ce
 - Runtime/security blockers are unchanged: no real SMS/reCAPTCHA, browser/Android end-to-end, Firestore Emulator/live profile test, or full shared-project Firestore rules audit has been verified. Do not deploy the partial Firestore rules.
 
 **Step 30 result:** The overlapping behavior is identified; PR #4 remains blocked pending a safe branch sync and runtime/security validation.
+
+
+## Step 31 — Verify branch-only commits and automated checks
+
+- Compared the current PR #3 base head against the recorded merge base. Exactly three commits are ahead of the merge base; their net file changes are limited to `customer-auth.js` and `customer-login.html` (two additions and two deletions in each file).
+- Reviewed PR #3 and PR #4 patches. PR #4's versions include additional OTP restart/phone lock, reCAPTCHA cleanup, and removal of the account-type toggle; these should not be overwritten by copying PR #3 files wholesale.
+- Queried combined commit status and PR-triggered workflow runs for the current PR #4 head. The connector returned no status entries and no workflow runs, so no passing CI run is verified. This does not prove that no workflow is configured.
+- PR #4 remains open/draft/unmerged and reports `mergeable: false`; the branch comparison remains diverged (40 commits ahead, 3 behind). The available GitHub connector does not expose the Git tree metadata or a conflict-resolution/merge-branch action needed to construct and verify a normal merge commit safely. I did not attempt a force update or manually rewrite branch history.
+- Therefore, the branch synchronization blocker is still open. Do not merge PR #4 yet. Continue with a normal Git merge/rebase in a Git-capable environment or enable a supported merge-branch operation, resolve the two overlapping files while preserving both feature sets, and recheck GitHub mergeability.
+- No PR was merged, no deployment was performed, and no Firebase rules were deployed. Live SMS/reCAPTCHA, browser/Android end-to-end, Firestore Emulator/live profile tests, and the complete shared-project rules audit remain unverified.
+
+**Step 31 result:** Base-only changes are scoped to the auth/login files, but PR #4 still cannot be safely synchronized using the available operations. Automated checks are not verified as passing.
