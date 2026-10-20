@@ -735,3 +735,53 @@ Read-only comparison performed on 2026-10-20.
 
 **Step 79 result:** the checked-in Partner rules show concrete source-level conflicts with Website profile writes and Customer booking creation. Do not deploy this file or the Website draft rules as a workaround. The next blocking dependency is an authorized export of the deployed Firestore rules plus a complete Customer/Partner/Admin schema review; after that, create and test a shared rules candidate in the Emulator before any production rollout. No application code, Firestore rules, Firebase Console settings, or production data were changed in this step.
 
+
+
+# Step 80: Cross-repository customer and service-location schema inventory
+
+Read-only source inventory performed on 2026-10-20. This extends Step 79; it does not identify or modify the currently deployed Firebase rules.
+
+## Exact source evidence re-fetched
+
+- Website main:
+  - customer-profile.html blob e4c41d279640e6c62ee8a29786041d871ad7f922
+  - customer-auth.js blob f618eacc4290a45d3c8148d0245a8e2f2a2b0a69
+  - firebase-config.js blob f097543e7514338f44aab286132d468f66e9d207
+- Customer main:
+  - lib/features/profile/screens/name_setup_screen.dart blob 30601d4c884e2a30ffc7a7bcd4a1e09d330c3bfa
+  - lib/features/addresses/models/saved_address.dart blob 03c2f642141abcaae297bfd3b0b7f6ed51c045e8
+  - lib/features/addresses/services/address_service.dart blob a80281b7b6ee02b5c3c3fac4275881ee60190898
+  - lib/features/booking/screens/booking_confirmation_screen.dart blob 94d45b12c7873fc2d289e164df965c735c0c63cb
+  - lib/features/profile/screens/my_dogs_screen.dart blob b64b75ad7ed5b94840ddbcd27f3813acdf321d4c
+- Partner main: firestore.rules blob 7b02a8bfb4fe80ab04d72f59966e2e09c848ffd0.
+- Admin main: firebase.json blob 66037326c171ff15c5c73bb30860864ed8381291; lib/features/service_location/models/service_location_models.dart blob 7797a624b4a540438bace79e48d9631238f52be6.
+
+## Additional compatibility findings
+
+1. **Customer profile writer mismatch remains confirmed.** Website writes uid, name, gender, dateOfBirth (Timestamp), age, phoneNumber, email, photoUrl, role: "customer", profileCompleted, updatedAt, and conditionally createdAt. The checked-in Partner users/{userId} create allowlist does not include uid, gender, or profileCompleted; its update allowlist also excludes those keys. If that rules file were deployed unchanged, the Website profile write can be rejected. This is not evidence of deployed behavior.
+
+2. **Customer pet writes appear closer to the checked-in Partner pet allowlist, but still require emulator proof.** Customer pet writes include name, breed, age, size, gender, behaviour, specialCare, notes, updatedAt, and createdAt for new records. Partner rules permit these fields, require name and breed strings, and require timestamp fields. The exact runtime payload and rule evaluation have not been tested together in an Emulator in this step.
+
+3. **Customer address field names are mostly aligned with the checked-in Partner address allowlist.** The Customer model writes label, flatHouse, buildingSociety, area, landmark, city, pincode, pickupInstructions, latitude, longitude, isDefault, updatedAt, and createdAt for new addresses. Partner rules allow these keys and require label, area, city, pincode, and timestamp fields. A passing source comparison is not a substitute for running both rule and client tests together.
+
+4. **Booking creation is a hard source-level blocker in the checked-in Partner rules.** Customer BookingConfirmationScreen creates bookings/{bookingId} with bookingId, customerId, walkType, bookingPlan, serviceType, serviceName, petName, dogId, petDetails, pickupAddressId, pickupAddress, scheduledAt, duration, preferredTime, walkCount, walkSchedules, status: "pending", walkerId: null, cancelRequest: null, and createdAt; regular/custom plans add more fields. Partner firestore.rules explicitly uses allow create: if false for bookings/{bookingId}. If that exact rules file is deployed, Customer booking creation will fail. Do not weaken rules or enable live booking to bypass this.
+
+5. **Admin deployment source is not a rules source.** Admin root firebase.json configures Firebase Hosting only (build/web and SPA rewrite); the repository root listing contains no firestore.rules. The Admin models define service-location collections including countries, states, cities/districts, areas, localities and boundary/import records, but this inventory does not establish their complete authorization requirements. No safe shared ruleset can be generated from the Partner rules alone.
+
+## Step 80 gate table
+
+| Gate | Result |
+|---|---|
+| Customer profile/pet/address/booking writers re-fetched | PASS |
+| Partner checked-in user/pet/address/booking rules re-fetched | PASS |
+| Customer profile compatibility | FAIL if checked-in Partner rules are deployed unchanged |
+| Customer pet/address compatibility | Source-level partial match; Emulator verification pending |
+| Customer booking creation compatibility | FAIL if checked-in Partner rules are deployed unchanged |
+| Admin root rules source located | NOT FOUND in root; Hosting config only |
+| Deployed Firestore rules exported with authorization | NOT VERIFIED |
+| Shared Customer/Partner/Admin schema and rules agreed | NOT COMPLETE |
+| Firestore Emulator authorization matrix run | NOT RUN |
+| Production rules modified or deployed | NO |
+| Safe to deploy rules or claim live booking works | NO — BLOCKED |
+
+**Step 80 result:** the source inventory narrows the next work: keep website profile and booking production claims gated, assemble the authorized deployed-rules export and complete Admin schema/rules evidence, then create a shared candidate and test owner/admin/partner access plus booking create/cancel and pet/address/profile operations in the Firestore Emulator. No application code, Firebase Console settings, Firestore rules, or production data were changed.
