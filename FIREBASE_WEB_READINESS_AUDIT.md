@@ -735,3 +735,39 @@ Read-only comparison performed on 2026-10-20.
 
 **Step 79 result:** the checked-in Partner rules show concrete source-level conflicts with Website profile writes and Customer booking creation. Do not deploy this file or the Website draft rules as a workaround. The next blocking dependency is an authorized export of the deployed Firestore rules plus a complete Customer/Partner/Admin schema review; after that, create and test a shared rules candidate in the Emulator before any production rollout. No application code, Firestore rules, Firebase Console settings, or production data were changed in this step.
 
+# Step 80: Verify merged customer integration CI and record the remaining Firebase gate
+
+Read-only verification performed on 2026-10-20 against current main.
+
+## Verified GitHub state
+
+- Customer auth/profile integration PR #12 is merged into main at merge commit 81d231e10114eeb8dc8d9bfff06846505b89efdf. It explicitly excluded the incomplete Website-only Firestore rules and Firebase deployment pointer. PR: https://github.com/dojoplatform2026/DOJO-WALK-Website-/pull/12
+- Report publication PR #6 is merged into main at merge commit e4b11ca74a3f4c6464078c8c06beef2506c65c44. PR: https://github.com/dojoplatform2026/DOJO-WALK-Website-/pull/6
+- Re-fetched current Website main sources: customer-auth.js blob f618eacc4290a45d3c8148d0245a8e2f2a2b0a69; customer-profile.html blob e4c41d279640e6c62ee8a29786041d871ad7f922; firebase-config.js blob f097543e7514338f44aab286132d468f66e9d207.
+- Workflow run 39265898037, Customer auth integration checks, completed successfully. JS/profile-module syntax, HTML/local-link and DOM-selector checks passed.
+- Workflow run 39265898046, Validate static website, completed successfully. HTML links, local assets and preview-form validation passed.
+- Re-fetched checked-in Partner rules from dojoplatform2026/dojo-partner main: blob 7b02a8bfb4fe80ab04d72f59966e2e09c848ffd0. Its firebase.json only declares Functions configuration and does not prove these rules are deployed.
+
+## What this proves — and does not prove
+
+The Website integration is merged and the identified static checks passed. These workflow jobs do not run Firebase Emulator, assert Firestore permissions, send real OTP SMS, inspect Firebase Console authentication settings, or run browser end-to-end tests.
+
+The checked-in Partner rules still conflict with the Website profile payload (missing uid, gender, and profileCompleted in its user field allowlists) and explicitly deny Customer booking creation. This is a source-level warning only; the active Firebase project's deployed rules remain UNKNOWN.
+
+## Step 80 gate table
+
+| Gate | Result |
+|---|---|
+| Customer auth/profile integration merged into Website main | PASS |
+| Auth integration static CI run 39265898037 | PASS |
+| Website static validation run 39265898046 | PASS |
+| Website auth/profile/config blobs re-fetched | PASS |
+| Partner checked-in rules re-fetched | PASS |
+| Deployed Firestore rules exported from Firebase | NOT AVAILABLE / NOT VERIFIED |
+| Canonical shared Customer/Partner/Admin rules contract approved | NO |
+| Firestore Emulator authorization tests run | NOT RUN |
+| Real OTP and browser end-to-end tests run | NOT RUN |
+| Production Firestore rules changed/deployed | NO |
+| Safe to deploy rules | NO — BLOCKED |
+
+**Step 80 result:** GitHub integration and static CI evidence are reconciled. The next actionable dependency is an authorized export/copy of the currently deployed Firestore rules and confirmation of Firebase Authentication settings for project dojo-platform-b68a3. After that, review the full Customer/Partner/Admin contract, implement a separate candidate ruleset, and run Emulator allow/deny tests before any production rollout. Do not deploy the Website-only rules or checked-in Partner rules as a shortcut. No application code, Firebase Console settings, Firestore rules, or production data were changed in this step.
