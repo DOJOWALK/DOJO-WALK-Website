@@ -3,7 +3,7 @@
 **Overall result: Website source integration is merged; live Firebase production readiness is still NOT VERIFIED.**
 
 - **Target Firebase project:** `dojo-platform-b68a3` (from the public client config; this does not prove live Console settings).
-- **Current source-control status:** Home polish PR #2, login structure PR #3, and customer login/profile integration PR #12 are merged into `main`. PR #12 merge commit: `81d231e10114eeb8dc8d9bfff06846505b89efdf`. Earlier PR #5 was a separate branch-chain PR and should not be used as the current source of truth.
+- **Latest audit update:** Step 79 — cross-repository checked-in rules compatibility recheck.\n- **Current source-control status:** Home polish PR #2, login structure PR #3, and customer login/profile integration PR #12 are merged into `main`. PR #12 merge commit: `81d231e10114eeb8dc8d9bfff06846505b89efdf`. Earlier PR #5 was a separate branch-chain PR and should not be used as the current source of truth.
 - **Current-head static CI:** auth integration run `39265898037` and static website run `39265898046` both completed successfully. Their jobs were re-fetched and verified. These are static checks, not live Firebase tests.
 - **Main-branch files verified:** `customer-auth.js`, `customer-login.html`, `customer-profile.html`, and `firebase-config.js` are present. Root `firestore.rules` and root `firebase.json` returned 404 on `main`; this is only a root-path finding and does not identify deployed Firebase rules.
 - **Known cross-repo risk:** the previously inspected Partner checked-in rules have a user-profile field allowlist mismatch and explicitly deny booking creation. The currently deployed rules are still unknown.
@@ -700,4 +700,38 @@ Read-only review of the current `main` versions of `customer-auth.js`, `customer
 | Safe to deploy Firestore rules | NO — blocked pending shared rules review and Emulator tests |
 
 **Step 78 result:** source-level review is recorded. No app code, Firestore rules, Firebase Console settings, or production data were changed. The next meaningful gate is an authorized export of the deployed Firestore rules and confirmation of Firebase Authentication settings; without those, production readiness cannot be proven or safely fixed from source code alone.
+
+# Step 79: Re-check shared-rule compatibility against current checked-in Partner rules
+
+Read-only comparison performed on 2026-10-20.
+
+## Evidence re-fetched
+- Website `main`: `customer-auth.js` blob `f618eacc4290a45d3c8148d0245a8e2f2a2b0a69`, `customer-profile.html` blob `e4c41d279640e6c62ee8a29786041d871ad7f922`, `firebase-config.js` blob `f097543e7514338f44aab286132d468f66e9d207`.
+- Partner `main`: `firestore.rules` blob `7b02a8bfb4fe80ab04d72f59966e2e09c848ffd0`; `firebase.json` blob `9c0a48062869c158b2f52db3a4946611ad14101a`.
+- Root `firestore.rules` and `firebase.json` still return 404 on Website `main`; Customer root paths also return 404, while Admin root paths were not readable at the guessed paths. These path results do not identify what is deployed in Firebase.
+
+## Compatibility findings from checked-in Partner rules
+
+1. **Website profile writer vs Partner allowlist:** the Website profile writes `uid`, `profileCompleted`, `gender`, `age`, and `email` (among other profile fields). The checked-in Partner `users/{userId}` create allowlist includes `name`, `phoneNumber`, `email`, `role`, `dateOfBirth`, `dob`, `age`, `photoUrl`, `profileImage`, `createdAt`, `updatedAt`, `language`, and `notificationEnabled`; it does **not** include `uid`, `gender`, or `profileCompleted`. Its update allowlist also does not include `uid`, `gender`, or `profileCompleted`. If this checked-in rules file were deployed as-is, the website profile payload may be rejected. This is a source-level incompatibility, not proof of deployed behavior.
+2. **Customer booking writer vs Partner rules:** the checked-in Partner rules explicitly set `allow create: if false` for `bookings/{bookingId}`. If deployed as-is, Customer booking creation would be rejected. The same rules deny all reads/writes to `walk_requests/{requestId}`. Production use/status of this file is unknown.
+3. **Role field caution:** Website client code writes `role: "customer"`. Authorization must be derived from trusted rules/admin provisioning, not from a client-written role field. The checked-in Partner rules limit the role value on profile create/update, but the full deployed shared policy remains unknown.
+4. **No shared rules candidate can safely be inferred** from the Website or Partner repository alone. Admin's complete rules and all service-location, payment, audit, booking, pet, and address access requirements still need an agreed schema and authorized deployment evidence.
+
+## Step 79 gate table
+
+| Gate | Result |
+|---|---|
+| Website auth/profile/config source re-fetched on main | PASS |
+| Partner checked-in rules re-fetched on main | PASS |
+| Website profile payload compared to Partner user allowlists | PASS — incompatibilities confirmed in source |
+| Customer booking creation compared to Partner checked-in rules | PASS — create explicitly denied in that file |
+| Current deployed rules retrieved from Firebase | NOT VERIFIED |
+| Admin complete rules and schema inventory | NOT COMPLETE |
+| Shared production rules candidate approved | NO |
+| Emulator authorization tests run | NOT RUN |
+| Live OTP/browser E2E run | NOT RUN |
+| Production Firebase rules changed/deployed | NO |
+| Safe to deploy rules | NO — BLOCKED |
+
+**Step 79 result:** the checked-in Partner rules show concrete source-level conflicts with Website profile writes and Customer booking creation. Do not deploy this file or the Website draft rules as a workaround. The next blocking dependency is an authorized export of the deployed Firestore rules plus a complete Customer/Partner/Admin schema review; after that, create and test a shared rules candidate in the Emulator before any production rollout. No application code, Firestore rules, Firebase Console settings, or production data were changed in this step.
 
