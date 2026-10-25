@@ -32,7 +32,7 @@ Open `index.html` in a browser. For a local HTTP preview, run a static web serve
 - Confirm live service areas, prices, service terms and operational claims with the admin configuration.
 - Test all links and layout on mobile and desktop.
 - Configure the custom domain in Firebase Hosting when the domain is owned.
-- For GitHub Actions deployment, add the repository Actions secret `FIREBASE_SERVICE_ACCOUNT_DOJO_PLATFORM_B68A3` containing a Firebase service-account JSON authorized to deploy Hosting to project `dojo-platform-b68a3`.
+- For GitHub Actions deployment, add the repository Actions secret `FIREBASE_SERVICE_ACCOUNT_DOJO_WALK` containing a Firebase service-account JSON authorized to deploy Hosting to project `dojo-platform-b68a3`.
 - The Firebase Hosting target `dojowalk` is mapped to the site ID `dojowalk`; verify the site ID in Firebase Console before merging.
 
 **Important:** This website describes the intended service and product flow. It does not claim that bookings, live tracking, partner applications, support channels or all listed operational features are currently live.
