@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "dojo-platform-b68a3"
+  },
+  "targets": {
+    "dojo-platform-b68a3": {
+      "hosting": {
+        "dojowalk": [
+          "dojowalk"
+        ]
+      }
+    }
+  }
+}
