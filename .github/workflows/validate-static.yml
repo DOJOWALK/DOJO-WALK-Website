@@ -1,8 +1,17 @@
 name: Validate static website
 
 on:
+  push:
+    branches: ["working"]
+    paths:
+      - "index.html"
+      - "assets/**"
+      - "*.html"
+      - "*.css"
+      - "*.js"
+      - ".github/workflows/validate-static.yml"
   pull_request:
-    branches: ["main"]
+    branches: ["main", "working"]
   workflow_dispatch:
 
 permissions:
